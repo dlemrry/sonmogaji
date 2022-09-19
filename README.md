@@ -1,96 +1,84 @@
-# 📌 **Git 컨벤션**
+# 서비스 개요 readme
 
-### **기본**
+# 1. 기획의도
 
-- init 제외하고 **git add . 금지! (수정한 소스 파일만 add 해주세요)
-- master,dev branch 부터는 CI/CD(Jenkins) 연결 후 자동 빌드
+- 우리는 가족, 친구, 연인 간에 수많은 약속을 하지만, 어딘가에 남겨놓지 않는다면 쉽게 잊어버리고 약속을 깨트리기 십상입니다. 블록체인의 투명성, 탈중앙화는 네트워크에 등록된 약속이 변조되지 않으면서도 블록체인 네트워크가 살아있는 한 영원히 유지될 수 있도록 합니다. 이러한 측면에서 블록체인은 약속을 기록하기에 좋은 수단입니다. 저희는 이러한 블록체인의 특성에 착안해서 간편하게 블록체인에 약속을 등록하고, 이를 확인할 수 있는 서비스를 생각했습니다.
 
-### **브랜치 양식**
+# 2. 특징
 
-- git flow에서 제공하는대로
-    - master branch→ `main`
-    - development branch→ `dev`
-    - release → `release/`
-    - hotfix → `hotfix/`
-    - bugfix → `bugfix/`
-    - feature → `feature/`
-- feature branch
-    - 프론트엔드의 경우 `FE/` 백엔드의 경우 `BE/`를 쓰고 `기능이름`
-        
-        ex) `git flow feature start BE/login`
-        
-- release branch
+- 회원가입 없이 약속을 블록체인에 등록할 수 있습니다.
+- websocket 기술을 활용하여 실시간으로 함께 각서를 작성할 수 있습니다.
+- 각서 작성 시 다운로드 받은 사진을 업로드하여 유효한 각서인지를 확인할 수 있습니다.
+
+# 3. 주요 기능
+
+## 각서 등록하기
+
+- 각서는 하나의 채팅방에서 작성됩니다.
+    - 방장이 각서 등록을 위한 방을 생성한 다음, 다른 당사자들과 참여자들에게 채팅방 참여 링크를 공유하여 입장할 수 있도록 합니다.
+    - 방장과 참여자들은 오른쪽 채팅창을 통해 소통할 수 있으며, 각서는 왼쪽 화면에서 방장에 의해 작성됩니다.
     
-    ex) `git flow release start 1.0.0`
+    ![Untitled](/uploads/76055be52ab33433ee548c6e35fb5a8b/Untitled.png)
     
-    - 설명 및 예제
-        
-        `<major>.<minor>.<etc>`
-        
-        **major** : 호환이 안되는 변경, Framework 변경, 함수 삭제, 이름 변경 등의 커다란 변경사항을 말합니다. 구조 자체가 변화
-        
-        **minor** : 호환이 가능한 변경, 기능 추가, 컴포넌트 추가, 클래스 추가, 함수 추가 등, 변경사항이 이전의 버전에서 추가되는 것을 뜻합니다.
-        
-        **etc** : 버그 수정, 약간의 디자인 변경, 사소한 변동사항 등을 뜻합니다.
-        
-        **예제**
-        
-        1.0.0 : 버전 1 릴리즈 되고 버그 수정 등이 한번도 안된 초기버전(그나마 1인 것은 정식 배포가 이뤄진 것을 뜻합니다.)
-        
-        1.0.3 : 버전 1 릴리즈 되고 버그 수정 등이 3번 있었던 버전
-        
-        1.3.0 : 버전 1에, 새로운 기능 추가, 1.0, 1.1, 1.2 버전과 호환이 가능합니다. 한번도 버그 수정이 없었네요.
-        
-        2.1.11: 버전 2 릴리즈 되고 버그 수정 등이 11번 있었고, 2.0 과 호환이 가능한 버전입니다.
-        
-- branch naming
-    - / 하위 브랜치로
-        - dev/frontend/기능명(login ……. )
-        - dev/backend/기능명(login ……. )
+    - 각각의 단계에서 방장을 제외한 모든 사람들이 동의한 후 방장이 다음 단계로 이동할 수 있습니다.
+    
+    ![Untitled_1](/uploads/fd360031d85e7cd0c2536e55f939d174/Untitled_1.png)
+    
+    - 채팅방에 참여 중인 전원이 서명할 필요는 없습니다. 현재 참여 중인 사람 중 서명할 사람만을 선택하여 서명을 받습니다.
+    - 최종확인 단계에서 각서 이미지와 기타 선택사항들을 확인하고, 모두가 동의하면 블록체인에 각서가 등록됩니다.
+    
+    ![Untitled_2](/uploads/97966be8974ab490f7071e97a224a5a8/Untitled_2.png)
+    
+    - 각서 작성 완료 후 각서 이미지를 받을 수 있으며, 해당 이미지에는 tx주소가 숨겨져 있어 추후에 각서를 검증하는 데 활용됩니다.
 
-### **커밋 양식**
+## 각서 검증
 
-- feature
-    - [#지라이슈번호][BE/FE] feat: <메시지>
-        
-        ex) `[#S07P12A5-1][FE] feat: add login form`
-        
-- fix
-    - [#지라이슈번호][BE/FE] fix: <메시>
-- refactor
-    - [#지라이슈번호][BE/FE] refactor: <수정한 파일이름>
-        
-        ex) `[#2][FE] refactor: HelloWorld.vue`
-        
-- Markdown, Image 등 문서를 생성 혹은 수정한 경우
-    - docs: <메시지>
-- 중괄호, 세미콜론 위치 등의 간단한 변경(style guide)
-    - style: <수정한 파일이름>
-- 테스트를 추가, 변경하는 경우
-    - test: <수정한 파일이름>
-- 기타 모든 잡무: 설정파일(package.json, application.json 등)을 변경한 경우
-    - chore: <수정한 파일이름>
-- 만약 위에 해당하는게 없다고 생각되면 아래 표를 참고해서 커밋할 것
-    - 태그이름: <메시지> 혹은 <수정한 파일이름>
-        
-        ![image](/uploads/2fee80fdd3cab6a1c657ac1c3d4f23c1/image.png)
-        
-
-# 📌 **JIRA 태스크 컨벤션**
-
-- **에픽**
-    - 기획
-    - 설계
-    - 개발(FE): `<기능이름>`
-    - 개발(BE): `<기능이름>`
+- 각서 검증페이지에서 각서 이미지를 업로드 하면 해당 각서가 유효한 것인지를 확인해줍니다.
+    
+    ![Untitled_3](/uploads/236088379d18b8c0051d7742676a3b9d/Untitled_3.png)
+    
+- 이는 각서 이미지 내에 숨겨져 있는 tx 주소를 기반으로 이루어집니다.
+- 만약 해당 tx 주소가 블록체인 네트워크 상에 존재하지 않는다면 계약서가 존재하지 않는다는 페이지를 보여줍니다.
+    
+    ![Untitled_4](/uploads/0a4ea1b22e1bac1d43d74db840838546/Untitled_4.png)
+    
+- 존재한다면 각서가 검증되었다는 표시와 함께, 각서 작성시 업로드하였던 사진을 보여줍니다.
+    
+    ![Untitled_5](/uploads/e5b5e308d5a5abbfa25fbf0b9e8e114b/Untitled_5.png)
     
 
-# 📌 Style Guide
-<aside>
-💡 Git, Jira 컨벤션 - 나머지는 공식문서 style guide를 따릅니다
+## 체인 둘러보기
 
-</aside>
+- 다른 사람들이 만든 공개된 각서를 볼 수 있습니다. 각서의 공개, 비공개 여부는 각서 작성 시 설정가능합니다.
+    
+    ![Untitled_6](/uploads/7d18f165c568572e08abaa80d107199b/Untitled_6.png)
+    
 
-[Google Java Style Guide](https://google.github.io/styleguide/javaguide.html)
+# 4. 기술스택 및 아키텍쳐
 
-[Style Guide | Vue.js](https://vuejs.org/style-guide/)
+## 기술스택
+
+### FE
+
+Vue2 (bootstrap / vuetify) / stomp / mocha chai / Truffle + web3
+
+### BE
+
+Spring boot /  JPA
+
+### Infra
+
+EC2, S3, NginX (Redis)
+
+### Blockchain
+
+Truffle web3
+
+## 아키텍쳐
+
+![A308_시스템_구성도](/uploads/6bad473d3064c4ca61ef481dbba12723/A308_시스템_구성도.png)
+
+# 5. 기대 효과
+
+- 가족, 친구, 연인들과 약속을 만들면서 추억을 만들 수 있습니다.
+- 장난스럽게 만든 약속이라도 증거를 남길 수 있습니다.
