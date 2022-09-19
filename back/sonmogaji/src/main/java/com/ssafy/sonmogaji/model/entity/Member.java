@@ -22,5 +22,12 @@ public class Member {
 	@Id
 	@Column(name = "member_address")
 	private String memberAddress;
+	
+	// nonce
+	@Column(name = "nonce")
+	private Integer nonce;
+	
+	@Column(name = "role")
+	private Enum role;
 
 }

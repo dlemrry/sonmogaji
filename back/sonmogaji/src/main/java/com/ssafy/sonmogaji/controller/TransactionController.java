@@ -39,11 +39,31 @@ public class TransactionController {
 		}
 	
 	// 내 각서 조회
+		public ResponseEntity<?> readAllMyTransactions() throws Exception {
+			try {
+				return null;
+			} catch (Exception e) {
+				return exceptionHandling(e);
+			}
+		}
 	
 	// 각서 내용 조회
+		public ResponseEntity<?> readOneTransaction() throws Exception {
+			try {
+				return null;
+			} catch (Exception e) {
+				return exceptionHandling(e);
+			}
+		}
 	
 	// 추억 이미지 조회
-		
+		public ResponseEntity<?> readMemoryImage() throws Exception {
+			try {
+				return null;
+			} catch (Exception e) {
+				return exceptionHandling(e);
+			}
+		}
 		
 	// 예외처리
 		private ResponseEntity<String> exceptionHandling(Exception e) {
