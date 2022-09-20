@@ -2,6 +2,8 @@ package com.ssafy.sonmogaji.model.entity;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.Id;
 
 import lombok.AllArgsConstructor;
@@ -28,6 +30,7 @@ public class Member {
 	private Integer nonce;
 	
 	@Column(name = "role")
-	private Enum role;
+	@Enumerated(EnumType.STRING)
+	private Role role;
 
 }

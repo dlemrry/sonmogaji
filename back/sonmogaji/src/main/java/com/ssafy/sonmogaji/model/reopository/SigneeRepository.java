@@ -1,9 +1,11 @@
 package com.ssafy.sonmogaji.model.reopository;
 
+import java.util.List;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 
-import com.ssafy.sonmogaji.model.entity.Signees;
+import com.ssafy.sonmogaji.model.entity.Signee;
 
-public interface SigneeRepository extends JpaRepository<Signees, Long>{
-
+public interface SigneeRepository extends JpaRepository<Signee, Long>{
+	List<Signee> findByMemberMemberAddress(String memberAddress);
 }
