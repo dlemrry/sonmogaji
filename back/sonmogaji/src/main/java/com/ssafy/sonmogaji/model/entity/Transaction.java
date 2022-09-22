@@ -48,8 +48,8 @@ public class Transaction {
 	private Boolean imageIsSecret;
 	
 	// 비공개 여부
-	@Column(name = "is_secret")
-	private Boolean isSecret;
+	@Column(name = "tx_is_secret")
+	private Boolean txIsSecret;
 	
 	// 각서 생성날짜
 	@Column(name = "tx_create_date")
@@ -71,7 +71,7 @@ public class Transaction {
 				.imageTitle(imageTitle)
 				.imageUrl(imageUrl)
 				.imageIsSecret(imageIsSecret)
-				.isSecret(isSecret)
+				.txIsSecret(txIsSecret)
 				.txCreateDate(txCreateDate)
 				.txExpDate(txExpDate)
 				.txNftUrl(txNftUrl)

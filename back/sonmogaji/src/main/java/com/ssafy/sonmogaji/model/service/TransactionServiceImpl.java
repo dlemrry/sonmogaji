@@ -36,7 +36,7 @@ public class TransactionServiceImpl implements TransactionService {
 	@Override
 	public List<TransactionDto> readAllTransactions(Pageable pageable) {
 		List<TransactionDto> readTransactionDtos = new ArrayList<>();
-		List<Transaction> transactions = transactionRepository.findByIsSecret(false, pageable);
+		List<Transaction> transactions = transactionRepository.findByTxIsSecret(false, pageable);
 		
 		for(Transaction transaction : transactions) {
 			readTransactionDtos.add(transaction.toTransactionDto());
@@ -53,7 +53,7 @@ public class TransactionServiceImpl implements TransactionService {
 		List<Signee> signees = signeeRepository.findByMemberMemberAddress(memberAddress);
 		
 		for(Signee signee : signees) {
-			readTransactionDtos.add(transactionRepository.findbyTxAddress(signee.getTransaction().getTxAddress()).get().toTransactionDto());
+			readTransactionDtos.add(transactionRepository.findByTxAddress(signee.getTransaction().getTxAddress()).get().toTransactionDto());
 		}
 		
 		return readTransactionDtos;
@@ -63,7 +63,7 @@ public class TransactionServiceImpl implements TransactionService {
 	@Override
 	public TransactionDto readOneTransaction(String txAddress) {
 		
-		Transaction transaction = transactionRepository.findbyTxAddress(txAddress).get();
+		Transaction transaction = transactionRepository.findByTxAddress(txAddress).get();
 		
 		if(transaction == null ) {
 			return null;
@@ -76,7 +76,7 @@ public class TransactionServiceImpl implements TransactionService {
 	@Override
 	public String readMemoryImage(String txAddress) {
 		
-		Transaction transaction = transactionRepository.findbyTxAddress(txAddress).get();
+		Transaction transaction = transactionRepository.findByTxAddress(txAddress).get();
 		
 		if(!transaction.getImageIsSecret()) {
 			

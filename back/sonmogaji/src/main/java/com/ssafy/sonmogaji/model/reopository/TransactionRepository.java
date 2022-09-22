@@ -10,9 +10,8 @@ import com.ssafy.sonmogaji.model.entity.Transaction;
 
 public interface TransactionRepository extends JpaRepository<Transaction, String> {
 
-	List<Transaction> findByIsSecret(Boolean isSecret, Pageable pageable);
+	List<Transaction> findByTxIsSecret(Boolean isSecret, Pageable pageable);
 	
-	
-	Optional<Transaction> findbyTxAddress(String txAddress);
+	Optional<Transaction> findByTxAddress(String txAddress);
 	
 }

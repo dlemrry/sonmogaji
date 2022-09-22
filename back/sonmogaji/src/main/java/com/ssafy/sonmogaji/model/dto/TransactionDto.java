@@ -34,7 +34,7 @@ public class TransactionDto {
 	private Boolean imageIsSecret;
 
 	// 비공개 여부
-	private Boolean isSecret;
+	private Boolean txIsSecret;
 
 	// 각서 생성날짜
 	private LocalDate txCreateDate;
