@@ -39,13 +39,12 @@ export default {
   },
   mounted(){
     console.log("sessionLobby");
-    this.stompConnect();
   },
   data() {
     return {};
   },
   methods: {
-    ...mapActions(["stompConnect"]),
+    ...mapActions(["memorandumStart"]),
     start() {
       console.log("시작");
       this.$router.push({ name: "sessionMain1" });
