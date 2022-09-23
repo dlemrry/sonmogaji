@@ -41,22 +41,47 @@ public class MessageController {
 
 
 	// 클라이언트에서 메세지가 날라왔다.
-	@MessageMapping(value = "/room/message")
+	@MessageMapping(value = "/memorandum")
 	// headerAccessor는 소켓서버의 주인ID를 확인하기 위해서 사용
-	public void message(MemorandumMessage message, SimpMessageHeaderAccessor headerAccessor) throws InterruptedException {
+	public void memo(MemorandumMessage message, SimpMessageHeaderAccessor headerAccessor) throws InterruptedException {
 		log.info(message.getType());
 		//이 방에서 게임하고있는 플레이어들
 		List<MemorandumParticipant> gpList = roomParticipantRepository.getMemorandumParticipant(message.getRoomId());
 
 		if (message.getType().equals("join")) {
-
-			template.convertAndSend("/sub/room" + message.getRoomId(), message);
+			message.setType("join");
+			template.convertAndSend("/memorandum" + message.getRoomId(), message);
 
 		}
 
 		// 게임이 시작버튼이 눌렸다.
 		if (message.getType().equals("vote")) {
-			template.convertAndSend("/sub/room" + message.getRoomId(), message);
+			message.setType("vote");
+			template.convertAndSend("/memorandum" + message.getRoomId(), message);
+
+		}
+
+
+
+	}
+
+	@MessageMapping(value = "/chat")
+	// headerAccessor는 소켓서버의 주인ID를 확인하기 위해서 사용
+	public void chat(MemorandumMessage message, SimpMessageHeaderAccessor headerAccessor) throws InterruptedException {
+		log.info(message.getType());
+		//이 방에서 게임하고있는 플레이어들
+		List<MemorandumParticipant> gpList = roomParticipantRepository.getMemorandumParticipant(message.getRoomId());
+
+		if (message.getType().equals("join")) {
+			message.setType("join");
+			template.convertAndSend("/chat" + message.getRoomId(), message);
+
+		}
+
+
+		if (message.getType().equals("send")) {
+			message.setType("send");
+			template.convertAndSend("/chat" + message.getRoomId(), message);
 
 		}
 
