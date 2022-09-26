@@ -1,4 +1,4 @@
-package config;
+package com.ssafy.sonmogaji.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

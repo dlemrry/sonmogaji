@@ -1,4 +1,4 @@
-package config;
+package com.ssafy.sonmogaji.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -26,7 +26,7 @@ public class SecurityConfig {
 				.antMatchers("/", "/favicon.ico", "/**/*.png", "/**/*.gif", "/**/*.svg", "/**/*.jpg", "/**/*.html",
 						"/**/*.css", "/**/*.js")
 				.permitAll() // 특정 URL을 설정하며, permitAll은 해당 URL의 접근을 인증없이 허용한다는 의미
-				// user - 로그인, 회원가입, 아이디 찾기, 비밀번호 찾기
+				.antMatchers("/**").permitAll()
 				.antMatchers("/v3/api-docs", "/swagger-ui", "/swagger-resources/**").permitAll().anyRequest()
 				.authenticated();
 
