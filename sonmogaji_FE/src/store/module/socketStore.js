@@ -4,78 +4,113 @@ import SockJS from "sockjs-client";
 
 const socketStore = {
   state: {
+    roomId:"",
+    nickname:"",
     socket: {},
     stomp: {},
-    chatmessages:[],
-    memorandumState:{},
+    chatmessages: [],
+    memorandumState: {},
   },
 
   getters: {
+    getRoomId(state){
+      return state.stomp
+    },
+    getNickname(state){
+      return state.nickname
+    },
     getStomp(state) {
       return state.stomp;
     },
     getSocket(state) {
       return state.socket;
     },
-    getChatmessages(state){
-      return state.chatmessages
+    getChatmessages(state) {
+      return state.chatmessages;
     },
-    getMemorandumState(state){
-      return state.memorandumState
+    getMemorandumState(state) {
+      return state.memorandumState;
     },
   },
 
   mutations: {
+    setRoomId(state,roomId){
+      state.roomId=roomId
+    },
+    setNickname(state,nickname){
+      state.nickname=nickname
+    },
     setStomp(state, stomp) {
       state.stomp = stomp;
     },
     setSocket(state, socket) {
       state.socket = socket;
     },
-    setChatmessages(state,messages){
-      state.chatmessages=messages;
+    setChatmessages(state, messages) {
+      state.chatmessages = messages;
     },
-    receiveChatmessages(state, message){
+    receiveChatmessages(state, message) {
       state.chatmessages.push(message);
     },
-    setMemorandumState(state, memorandumstate){
-      state.memorandumState=memorandumstate;
-    }
+    setMemorandumState(state, memorandumstate) {
+      state.memorandumState = memorandumstate;
+    },
   },
 
   actions: {
     //stomp socket 요청들
     //socket 연결들
 
-    memorandumStart({ commit, state }) {
+    roomCreate({ commit, state }) {
       state.stomp.send(
-        "/memorandum",
+        "/pub/memorandum/create",
         {},
         JSON.stringify({
-          type: "start",
+          roomId:state.roomId,
         })
       );
     },
-    memorandumVote({ commit, state ,payload}) {
+    
+    roomJoin({ commit, state }) {
       state.stomp.send(
-        "/memorandum",
+        "/pub/memorandum/join",
         {},
         JSON.stringify({
-          type: "vote",
+          roomId: state.roomId,
+          senderNickname:state.nickname
         })
       );
     },
-    chat({ commit, state ,payload}) {
+    roomStart({ commit, state }) {
       state.stomp.send(
-        "/chat",
+        "/pub/memorandum/start",
         {},
         JSON.stringify({
-          type: "send",
-          chatmessage: payload
+          roomId:state.roomId,
         })
       );
     },
-    clearChat({ commit}) {
+    roomVote({ payload, commit, state }) {
+      state.stomp.send(
+        "/pub/memorandum/action",
+        {},
+        JSON.stringify({
+          roomId:state.roomId,
+        })
+      );
+    },
+    chat({ message, commit, state }) {
+      state.stomp.send(
+        "/pub/chat/message",
+        {},
+        JSON.stringify({
+          sender: state.nickname,
+          message: message,
+          roomId:state.roomId,
+        })
+      );
+    },
+    clearChat({ commit }) {
       commit("setChatmessages", []);
     },
 
@@ -97,33 +132,20 @@ const socketStore = {
           console.log("소켓 연결 성공");
           commit("setStomp", state.stomp);
 
-          state.stomp.subscribe("/memorandum", (res) => {
+          state.stomp.subscribe("sub/memorandum/join"+state.roomId, (res) => {
             var content = JSON.parse(res.body);
-            let type = content.type;
-            switch (type) {
-              case "join":
-                break;
+            commit("setRoomId",content.roomId)
+            commit("setChatmessages", content.chatLog);
 
-              case "vote":
-                break;
-              default:
-                break;
-            }
+          });
+          state.stomp.subscribe("sub/memorandum/action"+state.roomId, (res) => {
+            var content = JSON.parse(res.body);
           });
 
-          state.stomp.subscribe("/chat", (res) => {
+          state.stomp.subscribe("sub/chat/send"+state.roomId, (res) => {
             var content = JSON.parse(res.body);
-            let type = content.type;
-            switch (type) {
-              case "join":
-                break;
 
-              case "send":
-                commit("receiveChatmessages", content.message);
-                break;
-              default:
-                break;
-            }
+            commit("receiveChatmessages", { sender: content.sender, message: content.message });
           });
         },
         (error) => {
