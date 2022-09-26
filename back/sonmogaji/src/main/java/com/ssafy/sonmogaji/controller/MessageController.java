@@ -1,118 +1,164 @@
 package com.ssafy.sonmogaji.controller;
 
-import com.ssafy.sonmogaji.model.service.*;
 import com.ssafy.sonmogaji.model.entity.*;
-import com.ssafy.sonmogaji.model.repository.*;
-import com.ssafy.sonmogaji.model.entity.MemorandumMessage;
-import com.ssafy.sonmogaji.model.entity.MemorandumParticipant;
-import lombok.RequiredArgsConstructor;
+import com.ssafy.sonmogaji.model.entity.MemorandumAction;
+import com.ssafy.sonmogaji.model.entity.Participant;
+import lombok.*;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Profile;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Controller;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
-import java.util.Random;
 
 @Controller
 @RequiredArgsConstructor
 @Log4j2
-/**
- * @MessageMapping을 통해 Websocket으로 들어오는 메시지 발행을 처리합니다. 클라이언트에서는 prefix를 붙여서
- *                  /pub/game/message로 발행 요청을 하면 Controller가 해당 메시지를 받아 처리합니다.
- *                  메시지가 발행되면 /sub/game/room/{roomId}로 메시지를 send 하는 것을 볼 수 있는데
- *                  클라이언트에서는 해당 주소를(/sub/game/room/{roomId}) 구독(subscribe)하고 있다가
- *                  메시지가 전달되면 화면에 출력하면 됩니다. 여기서 /sub/game/room/{roomId}는 채팅룸을
- *                  구분하는 값이므로 pub/sub에서 Topic의 역할이라고 보면 됩니다.
- */
-//기존의 WebSocketHandler가 했던 역할을 대체한다!!
+@Profile("stomp")
 public class MessageController {
 
-	// 메세지를 보내는 양식을 지정해둔 template
-	// 이걸 사용하면 편하게 메세지를 클라이언트쪽으로 보낼 수 있음.
-	@Autowired
-	private final SimpMessagingTemplate template;
-	@Autowired
-	private RoomParticipantRepository roomParticipantRepository;
+    // 메세지를 보내는 양식을 지정해둔 template
+    // 이걸 사용하면 편하게 메세지를 클라이언트쪽으로 보낼 수 있음.
+    @Autowired
+    private final SimpMessagingTemplate template;
+    //	@Autowired
+//	private RoomRepository roomRepository;
+//
+    //싱글톤 방 리스트
+    private static final List<Room> roomList = new ArrayList<>();
+
+    @MessageMapping(value = "/memorandum/create")
+    public void create(MemorandumAction message, SimpMessageHeaderAccessor headerAccessor) throws InterruptedException {
+        log.info(message.getSenderNickName() + " created room");
+        Room newroom = new Room();
+        newroom.setRoomId(headerAccessor.getSessionId());
+        roomList.add(newroom);
+
+    }
+    @MessageMapping(value = "/memorandum/join")
+    // headerAccessor는 소켓서버의 주인ID를 확인하기 위해서 사용
+    public void join(MemorandumAction message, SimpMessageHeaderAccessor headerAccessor) throws InterruptedException {
+        log.info(message.getSenderNickName() + " join");
+
+        template.convertAndSend("/sub/memorandum/join" + message.getRoomId(), message);
 
 
-	// 클라이언트에서 메세지가 날라왔다.
-	@MessageMapping(value = "/memorandum")
-	// headerAccessor는 소켓서버의 주인ID를 확인하기 위해서 사용
-	public void memo(MemorandumMessage message, SimpMessageHeaderAccessor headerAccessor) throws InterruptedException {
-		log.info(message.getType());
-		//이 방에서 게임하고있는 플레이어들
-		List<MemorandumParticipant> gpList = roomParticipantRepository.getMemorandumParticipant(message.getRoomId());
+    }
 
-		if (message.getType().equals("join")) {
-			message.setType("join");
-			template.convertAndSend("/memorandum" + message.getRoomId(), message);
+    @MessageMapping(value = "/memorandum/action")
+    // headerAccessor는 소켓서버의 주인ID를 확인하기 위해서 사용
+    public void action(MemorandumAction message, SimpMessageHeaderAccessor headerAccessor) throws InterruptedException {
+        log.info(message.getSenderNickName() + " action");
 
-		}
-
-		// 게임이 시작버튼이 눌렸다.
-		if (message.getType().equals("vote")) {
-			message.setType("vote");
-			template.convertAndSend("/memorandum" + message.getRoomId(), message);
-
-		}
+        template.convertAndSend("/sub/memorandum/action" + message.getRoomId(), message);
 
 
-
-	}
-
-	@MessageMapping(value = "/chat")
-	// headerAccessor는 소켓서버의 주인ID를 확인하기 위해서 사용
-	public void chat(MemorandumMessage message, SimpMessageHeaderAccessor headerAccessor) throws InterruptedException {
-		log.info(message.getType());
-		//이 방에서 게임하고있는 플레이어들
-		List<MemorandumParticipant> gpList = roomParticipantRepository.getMemorandumParticipant(message.getRoomId());
-
-		if (message.getType().equals("join")) {
-			message.setType("join");
-			template.convertAndSend("/chat" + message.getRoomId(), message);
-
-		}
+    }
 
 
-		if (message.getType().equals("send")) {
-			message.setType("send");
-			template.convertAndSend("/chat" + message.getRoomId(), message);
+    // 클라이언트에서 메세지가 날라왔다.
+//	@MessageMapping(value = "/memorandum")
+//	// headerAccessor는 소켓서버의 주인ID를 확인하기 위해서 사용
+//	public void memo(MemorandumMessage message, SimpMessageHeaderAccessor headerAccessor) throws InterruptedException {
+//		log.info(message.getType());
+//		//이 방에서 게임하고있는 플레이어들
+//		List<MemorandumParticipant> gpList = roomParticipantRepository.getMemorandumParticipant(message.getRoomId());
+//
+//		if (message.getType().equals("join")) {
+//			message.setType("join");
+//			template.convertAndSend("/memorandum" + message.getRoomId(), message);
+//
+//		}
+//
+//		// 게임이 시작버튼이 눌렸다.
+//		if (message.getType().equals("vote")) {
+//			message.setType("vote");
+//			template.convertAndSend("/memorandum" + message.getRoomId(), message);
+//
+//		}
+//
+//
+//
+//	}
 
-		}
+    //roomId는 방장 id로
 
 
+    @MessageMapping("/chat/message")
+    public void message(chatFormat message, SimpMessageHeaderAccessor headerAccessor) {
 
-	}
+        template.convertAndSend("/sub/chat/room/" + message.getRoomId(), message);
+    }
 
-	//소켓 끊김 감지
-	public void onDisconnectEvent(String sessionId) {
-		int roomId = roomParticipantRepository.findRoomBySesssionId(sessionId);
+//
+//	@MessageMapping(value = "/chat")
+//	// headerAccessor는 소켓서버의 주인ID를 확인하기 위해서 사용
+//	public void chat(MemorandumMessage message, SimpMessageHeaderAccessor headerAccessor) throws InterruptedException {
+//		log.info(message.getType());
+//		//이 방에서 게임하고있는 플레이어들
+//		List<MemorandumParticipant> gpList = roomParticipantRepository.getMemorandumParticipant(message.getRoomId());
+//
+//		if (message.getType().equals("join")) {
+//			message.setType("join");
+//			template.convertAndSend("/chat" + message.getRoomId(), message);
+//
+//		}
+//
+//
+//		if (message.getType().equals("send")) {
+//			String sessionId = headerAccessor.getSessionAttributes().get("sessionId").toString();
+//
+//			message.setType("send");
+//			template.convertAndSend("/chat" + sessionId, message);
+//
+//		}
+//
+//
+//
+//	}
 
-		// 방에 나가면 player를 한명 내려준다.
+    //소켓 끊김 감지
+    public void onDisconnectEvent(String sessionId) {
 
-		// MemorandumParticipant에서 빼준다.
-		//지운애가 방장이면 true 반환한다.
-		boolean flag = roomParticipantRepository.deleteMemorandumParticipant(roomId, sessionId);
+        boolean found = false;
+        String userName = "";
+        //모든 방 순회해서 해당 유저 찾아냄
+        for (int i = 0; i < roomList.size(); i++) {
 
-		List<MemorandumParticipant> gpList = roomParticipantRepository.getMemorandumParticipant(roomId);
+
+            List<Participant> rParticipants = roomList.get(i).getParticipants();
+            for (int j = 0; j < rParticipants.size(); j++) {
+                if (rParticipants.get(j).getSessionId().equals(sessionId)) {
+                    Participant p = rParticipants.get(j);
+                    found = true;
+                    //방장이면 방 폭파
+                    if (p.isHost()) {
+                        roomList.remove(i);
+                    } else {
+                        userName = rParticipants.get(j).getNickname();
+                        rParticipants.remove(j);
+                    }
+                    break;
+                }
+            }
+            if (found) break;
+        }
 
 
-	}//session나가기 함수
+    }
 
 }
 
-// todo 게임끝날때 그전에 사람이 누른거 메시지 보내주기 -> Message에 알려주고 승리자는 winnerIdx로 알려주기
-// todo 게임끝났을때 unitBetting보다 돈 없는애 강퇴 -> 프론트에서 구현
-// todo GameEnd 메시지에도 정보 넣어주기 -> 해결
-// todo EXIT 메시지에 turnIdx 넣어주기 -> 해결
-// todo 게임방 6명이상이면 못들어가게 -> 해결
-
-// todo gameTotalBet 구하는 방식 변경 : 사람 나갔을 때 고려(GP에 totalBet만들기) -> 해결
-// todo room에 현재인원 추가 -> 해결
-// todo mission null값으로 넘어가는것 알려주기 -> 해결
-// todo 돈 적은애가 콜 누르면 allIn으로 가게? 올인이 아직 완벽하지 않다..?
+@Getter
+@Setter
+@AllArgsConstructor
+@NoArgsConstructor
+class chatFormat {
+    private String roomId;
+    private String sender;
+    private String message;
+}

@@ -5,18 +5,22 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.util.List;
-
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class MemorandumMessage {
+public class MemorandumAction {
 	private int roomId;
 	private String senderNickName;
-	private String socketId;
+	private String senderSocketId;
 	private String message;
-	private List<MemorandumParticipant> playerInfo;
-	private String type;
+	private String action;
+//	private String type;
 
 }
+
+//class MemorandumAction{
+//	private String message;
+//	private String action;
+//
+//}

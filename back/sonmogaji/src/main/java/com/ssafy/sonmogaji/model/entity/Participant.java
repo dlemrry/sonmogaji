@@ -10,9 +10,11 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class MemorandumParticipant {
-    private int roomId;
+public class Participant {
+//    private int roomId;
     private String nickname;
     private String sessionId;
+    private String signUrl;
+    private boolean isHost;
 
 }
