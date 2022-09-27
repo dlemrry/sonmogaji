@@ -8,27 +8,28 @@
 </template>
 
 <script>
-import SessionMain1 from "../../components/session/sessionmain1/SessionMain1";
-import Chatt from "./SessionChat.vue";
+import Chatt from "../../components/session/SessionChat.vue";
 
-import { mapState, mapActions } from "vuex";
+import { mapState, mapActions, mapGetters, mapMutations } from "vuex";
 import { map } from 'sockjs-client/lib/transport-list';
 export default {
   name: "SessionMain",
   data() {
     return {
-      ...mapState(["roomId","nickname"]),
+      ...mapState(["roomId","senderNickName"]),
+      ...mapGetters(["getRoomId","getSenderNickName"])
     };
   },
   components: {
-    Chatt,
+    Chatt
   },
   created() {
     console.log("sessionMain");
+    this.enterRoomId("testroom")
     this.stompConnect();
   },
   methods: {
-    ...mapActions(["stompConnect"]),
+    ...mapActions(["stompConnect","enterRoomId"]),
   },
 };
 </script>

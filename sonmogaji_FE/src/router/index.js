@@ -21,6 +21,28 @@ const routes = [
     component: () => import( '../views/AboutView.vue')
   },
   {
+    path: '/beforeEnter',
+    name: 'beforeEnter',
+    component: () => import( '../views/session/BeforeEnter.vue'),
+    redirect: to => {
+      return { path: '/beforeEnter/EnterNickname' }
+    },
+    children: [
+      
+      {
+        path: 'enterNickname',
+        name: 'enterNickname',
+        component: () => import( '../components/session/beforeEnter/EnterNickname.vue'),
+      },
+      {
+        path: 'chooseRoll',
+        name: 'chooseRoll',
+        component: () => import( '../components/session/beforeEnter/ChooseRoll.vue'),
+      },
+     
+    ]
+  },
+  {
     path: '/session',
     name: 'session',
     component:() => import( '../views/session/SessionMain.vue'),
@@ -28,6 +50,7 @@ const routes = [
       return { path: '/session/sessionLobby' }
     },
     children: [
+      
       {
         path: 'sessionLobby',
         name: 'sessionLobby',

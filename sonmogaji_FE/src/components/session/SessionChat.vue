@@ -2,17 +2,15 @@
   <b-container>
     <main id="app">
       <section ref="chatArea" class="chat-area">
-        <p
-          v-for="message in chatmessages"
-          :key="message"
-          class="message"
-          :class="{
-            'message-out': message.author === 'you',
-            'message-in': message.author !== 'you',
-          }"
-        >
-          {{ message.body }}
-        </p>
+        <ul     v-for="(message, index) in this.getChatmessages"  :key="index"  >
+          <li v-if="message.sender===getSenderNickName" class="message message-out"> 
+            {{ message.message }}
+          </li>
+          <li v-if="message.sender!=getSenderNickName" class="message message-in"> 
+            {{ message.message }}
+          </li>
+          
+        </ul>
       </section>
 
       <section class="chat-inputs">
@@ -34,18 +32,22 @@
 </template>
 
 <script>
-import { mapState, mapActions } from "vuex";
+import { mapState, mapActions, mapGetters } from "vuex";
 export default {
   name: "SessionChat",
   components: {},
-  computed: { ...mapState(["chatmessages", "stomp"]) },
-  created() {},
+  computed: {
+    ...mapState(["chatmessages", "stomp", "roomId", "nickname"]),
+    ...mapGetters(["getChatmessages", "getSenderNickName"]),
+  },
+  created() {
+    
+  },
   mounted() {
     console.log("sessionChat");
+    console.log(this.getSenderNickName)
   },
-  props: {
-    roomId: String,
-  },
+  props: {},
   data() {
     return {
       chatinput: "",
@@ -55,6 +57,7 @@ export default {
     ...mapActions(["chat"]),
     sendMessage() {
       this.chat(this.chatinput);
+      this.chatinput=""
     },
   },
 };
@@ -71,7 +74,7 @@ export default {
   background: white;
   height: 50vh;
   padding: 1em;
-  overflow: auto;
+  overflow-y: auto;
   max-width: 350px;
   margin: 0 auto 2em auto;
   box-shadow: 2px 2px 5px 2px rgba(0, 0, 0, 0.3);
