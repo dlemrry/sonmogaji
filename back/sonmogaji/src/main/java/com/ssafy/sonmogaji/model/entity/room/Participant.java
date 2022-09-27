@@ -1,4 +1,4 @@
-package com.ssafy.sonmogaji.model.entity;
+package com.ssafy.sonmogaji.model.entity.room;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

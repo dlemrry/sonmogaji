@@ -1,4 +1,4 @@
-package com.ssafy.sonmogaji.model.entity;
+package com.ssafy.sonmogaji.model.entity.room;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -11,6 +11,7 @@ import lombok.Setter;
 @NoArgsConstructor
 public class ChatMessage {
 //    private String roomId;
+
     private String sender;
     private String message;
 //    private String type;
