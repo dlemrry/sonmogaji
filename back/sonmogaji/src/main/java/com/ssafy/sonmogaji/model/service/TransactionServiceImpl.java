@@ -18,9 +18,9 @@ import com.ssafy.sonmogaji.model.dto.TransactionDto;
 import com.ssafy.sonmogaji.model.entity.Member;
 import com.ssafy.sonmogaji.model.entity.Signee;
 import com.ssafy.sonmogaji.model.entity.Transaction;
-import com.ssafy.sonmogaji.model.reopository.MemberRepository;
-import com.ssafy.sonmogaji.model.reopository.SigneeRepository;
-import com.ssafy.sonmogaji.model.reopository.TransactionRepository;
+import com.ssafy.sonmogaji.model.repository.MemberRepository;
+import com.ssafy.sonmogaji.model.repository.SigneeRepository;
+import com.ssafy.sonmogaji.model.repository.TransactionRepository;
 import com.ssafy.sonmogaji.util.Steganographer;
 
 import lombok.RequiredArgsConstructor;
