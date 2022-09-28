@@ -41,9 +41,10 @@ public class SecurityConfig {
 				.antMatchers("/", "/favicon.ico", "/**/*.png", "/**/*.gif", "/**/*.svg", "/**/*.jpg", "/**/*.html",
 						"/**/*.css", "/**/*.js")
 				.permitAll() // 특정 URL을 설정하며, permitAll은 해당 URL의 접근을 인증없이 허용한다는 의미
-				.antMatchers("/api/member/login").permitAll()
-				.antMatchers("/v3/api-docs", "/swagger-ui", "/swagger-resources/**").permitAll()
-				.anyRequest().authenticated();
+				.antMatchers("/**").permitAll()
+				.antMatchers("/v3/api-docs", "/swagger-ui", "/swagger-resources/**","/room").permitAll().anyRequest()
+				.authenticated().and().cors();
+
 
 		http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
 
