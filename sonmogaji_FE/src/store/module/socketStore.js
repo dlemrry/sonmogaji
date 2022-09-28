@@ -133,7 +133,7 @@ const socketStore = {
     },
 
     stompConnect({ commit, state }) {
-      const serverURL = "https://localhost:8080/room";
+      const serverURL = "https://j7a308.p.ssafy.io:8080/room";
 
       // let socket = new SockJS(serverURL);
       commit("setSocket", new SockJS(serverURL));
