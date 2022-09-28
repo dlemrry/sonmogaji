@@ -60,6 +60,56 @@ const routes = [
         path: 'sessionMain1',
         name: 'sessionMain1',
         component: () => import( '../components/session/sessionmain1/SessionMain1.vue'),
+        children: [
+      
+          {
+            path: 'main1Slide1',
+            name: 'main1Slide1',
+            component: () => import( '../components/session/sessionmain1/Main1Slide1.vue'),
+          },
+          {
+            path: 'main1Slide2',
+            name: 'main1Slide2',
+            component: () => import( '../components/session/sessionmain1/Main1Slide2.vue'),
+          },
+          {
+            path: 'main1Slide3',
+            name: 'main1Slide3',
+            component: () => import( '../components/session/sessionmain1/Main1Slide3.vue'),
+          },
+         
+         
+        ]
+      },
+      {
+        path: 'sessionMain2',
+        name: 'sessionMain2',
+        component: () => import( '../components/session/sessionmain2/SessionMain2.vue'),
+        
+      },
+      {
+        path: 'sessionMain3',
+        name: 'sessionMain3',
+        component: () => import( '../components/session/sessionmain3/SessionMain3.vue'),
+        
+      },
+      {
+        path: 'sessionMain4',
+        name: 'sessionMain4',
+        component: () => import( '../components/session/sessionmain4/SessionMain4.vue'),
+        
+      },
+      {
+        path: 'sessionMain5',
+        name: 'sessionMain5',
+        component: () => import( '../components/session/sessionmain5/SessionMain5.vue'),
+        
+      },
+      {
+        path: 'sessionMain6',
+        name: 'sessionMain6',
+        component: () => import( '../components/session/sessionmain6/SessionMain6.vue'),
+        
       },
      
     ]
