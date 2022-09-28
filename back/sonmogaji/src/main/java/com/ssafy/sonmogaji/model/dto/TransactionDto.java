@@ -1,10 +1,23 @@
 package com.ssafy.sonmogaji.model.dto;
 
 import java.time.LocalDate;
+import java.util.List;
 
 import javax.persistence.Column;
 import javax.persistence.Id;
 
+import com.ssafy.sonmogaji.model.entity.Signee;
+import com.ssafy.sonmogaji.model.entity.Transaction;
+
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class TransactionDto {
 	// tx 주소
 	private String txAddress;
@@ -25,7 +38,7 @@ public class TransactionDto {
 	private Boolean imageIsSecret;
 
 	// 비공개 여부
-	private Boolean isSecret;
+	private Boolean txIsSecret;
 
 	// 각서 생성날짜
 	private LocalDate txCreateDate;
@@ -35,5 +48,31 @@ public class TransactionDto {
 
 	// 각서 nft 주소
 	private String txNftUrl;
+	
+	// 각서 서명자들
+	private List<String> signees;
 
+	public Transaction toTransaction() {
+		return Transaction.builder()
+				.txAddress(txAddress)
+				.txTitle(txTitle)
+				.txContent(txContent)
+				.imageTitle(imageTitle)
+				.imageUrl(imageUrl)
+				.imageIsSecret(imageIsSecret)
+				.txIsSecret(txIsSecret)
+				.txCreateDate(txCreateDate)
+				.txExpDate(txExpDate)
+				.txNftUrl(txNftUrl)
+				.build();
+	}
+	
+	public Signee toSignee() {
+		return Signee.builder()
+				.signeeID(null)
+				.member(null)
+				.transaction(null)
+				.build();
+	}
+	
 }

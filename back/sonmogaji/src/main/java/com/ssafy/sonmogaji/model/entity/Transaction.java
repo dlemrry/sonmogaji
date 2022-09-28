@@ -6,6 +6,8 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 
+import com.ssafy.sonmogaji.model.dto.TransactionDto;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -46,8 +48,8 @@ public class Transaction {
 	private Boolean imageIsSecret;
 	
 	// 비공개 여부
-	@Column(name = "is_secret")
-	private Boolean isSecret;
+	@Column(name = "tx_is_secret")
+	private Boolean txIsSecret;
 	
 	// 각서 생성날짜
 	@Column(name = "tx_create_date")
@@ -60,5 +62,20 @@ public class Transaction {
 	// 각서 nft 주소
 	@Column(name = "tx_nft_url")
 	private String txNftUrl;
+	
+	public TransactionDto toTransactionDto() {
+		return TransactionDto.builder()
+				.txAddress(txAddress)
+				.txTitle(txTitle)
+				.txContent(txContent)
+				.imageTitle(imageTitle)
+				.imageUrl(imageUrl)
+				.imageIsSecret(imageIsSecret)
+				.txIsSecret(txIsSecret)
+				.txCreateDate(txCreateDate)
+				.txExpDate(txExpDate)
+				.txNftUrl(txNftUrl)
+				.build();
+	}
 	
 }
