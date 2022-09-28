@@ -42,12 +42,15 @@
 #section {
   padding-top: 100px;
 }
-
+p {
+  word-break: keep-all;
+}
 /* 클래스 관련*/
-.menu {
+.menu-box {
   height: 250px;
   margin-bottom: 25px;
   border: 0px;
+  color: white;
 }
 .bg-cyan {
   background-color: #36c2ba;

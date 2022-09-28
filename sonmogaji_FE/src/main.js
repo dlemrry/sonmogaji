@@ -8,14 +8,12 @@ import Vuex from "vuex";
 import "bootstrap/dist/css/bootstrap.css";
 import "bootstrap-vue/dist/bootstrap-vue.css";
 import VAnimateCss from "v-animate-css";
-import KeenSlider from "keen-slider";
 
 // Make BootstrapVue available throughout your project
 Vue.use(BootstrapVue);
 // Optionally install the BootstrapVue icon components plugin
 Vue.use(IconsPlugin);
 Vue.use(VAnimateCss);
-Vue.use(KeenSlider);
 
 Vue.config.productionTip = false;
 

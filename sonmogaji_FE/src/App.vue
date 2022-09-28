@@ -1,16 +1,19 @@
 <template>
   <div id="app">
     <HeaderNavBar id="header" />
-    <router-view id="section" />
+    <RouterView id="section" />
+    <FooterBar></FooterBar>
   </div>
 </template>
 
 <script>
 import HeaderNavBar from "@/components/layout/HeaderNavBar.vue";
+import FooterBar from "@/components/layout/FooterBar.vue";
 export default {
   name: "App",
   components: {
     HeaderNavBar,
+    FooterBar,
   },
 };
 </script>

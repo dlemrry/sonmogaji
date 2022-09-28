@@ -1,4 +1,4 @@
-<template >
+<template>
   <b-container class="bv-example-row">
     <b-row>
       <b-col>손모가지 에서 돌이킬 수 없는 약속을 해보세요!</b-col>
@@ -8,7 +8,7 @@
       <b-col
         ><b-card
           title="블록체인으로 박제!"
-          :img-src="require('../../../assets/chain.png')"
+          :img-src="require('@/assets/icons/chain.png')"
           img-alt="Image"
           img-top
           tag="article"
@@ -21,7 +21,7 @@
       <b-col
         ><b-card
           title="나만의 각서 이미지!"
-          :img-src="require('../../../assets/folder.png')"
+          :img-src="require('@/assets/icons/folder.png')"
           img-alt="Image"
           img-top
           tag="article"
@@ -36,7 +36,7 @@
       <b-col>
         <b-card
           title="실시간으로 함께 작성!"
-          :img-src="require('../../../assets/chat.png')"
+          :img-src="require('@/assets/icons/chat.png')"
           img-alt="Image"
           img-top
           tag="article"
@@ -53,6 +53,5 @@
 <script>
 export default {
   name: "CarouselSlide1",
-  
 };
 </script>
