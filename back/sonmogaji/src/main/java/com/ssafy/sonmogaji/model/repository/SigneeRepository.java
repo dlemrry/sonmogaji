@@ -1,4 +1,4 @@
-package com.ssafy.sonmogaji.model.reopository;
+package com.ssafy.sonmogaji.model.repository;
 
 import java.util.List;
 
