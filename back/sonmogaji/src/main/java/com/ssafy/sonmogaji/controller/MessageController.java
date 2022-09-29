@@ -10,7 +10,6 @@ import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.CrossOrigin;
 
-import java.util.LinkedList;
 import java.util.List;
 
 @Controller
@@ -33,23 +32,25 @@ public class MessageController {
     private RoomList roomList;
 
 
-    @MessageMapping(value = "/memorandum/create")
-    public void create(MemorandumAction message, SimpMessageHeaderAccessor headerAccessor) throws InterruptedException {
-        log.info(message.getSenderNickName() + " created room");
-        Room newroom = new Room(message.getRoomId());
-        newroom.setRoomId(headerAccessor.getSessionId());
-        roomList.getRoomList().add(newroom);
-
-    }
+//    @MessageMapping(value = "/memorandum/create")
+//    public void create(MemorandumAction message, SimpMessageHeaderAccessor headerAccessor) throws InterruptedException {
+//        log.info(message.getSenderNickName() + " created room");
+//        Room newroom = new Room(headerAccessor.getSessionId(),message.getSenderNickName());
+//        //newroom.setHostSessionId(headerAccessor.getSessionId());
+//        roomList.getRoomList().add(newroom);
+//        template.convertAndSend("/sub/memorandum/join/" + message.getRoomCode(), message);
+//
+//    }
     @MessageMapping(value = "/memorandum/join")
     // headerAccessor는 소켓서버의 주인ID를 확인하기 위해서 사용
-    public void join(chatLogFormat message, SimpMessageHeaderAccessor headerAccessor) throws InterruptedException {
+    public void join(MemorandumAction message, SimpMessageHeaderAccessor headerAccessor) throws InterruptedException {
 //        log.info(message.getSenderNickName() + " join");
-        Room r = roomList.findRoomByRoomId(message.getRoomId());
-        log.info(message.getSenderNickName() + " join into " +r.getRoomId());
-        message.setChatLog(r.getChatLog());
-
-        template.convertAndSend("/sub/memorandum/join/" + message.getRoomId(), message);
+        Room r = roomList.findRoomByRoomCode(message.getRoomCode());
+        log.info(message.getSenderNickName() + " join into " +r.getRoomCode());
+        r.addParticipant(message.getSenderNickName(),headerAccessor.getSessionId());
+        message.setRoomCode(message.getRoomCode());
+        message.setMessage("joined" +message.getRoomCode());
+        template.convertAndSend("/sub/memorandum/join/" + message.getRoomCode(), message);
 
 
     }
@@ -59,7 +60,7 @@ public class MessageController {
     public void action(MemorandumAction message, SimpMessageHeaderAccessor headerAccessor) throws InterruptedException {
         log.info(message.getSenderNickName() + " action");
 
-        template.convertAndSend("/sub/memorandum/action/" + message.getRoomId(), message);
+        template.convertAndSend("/sub/memorandum/action/" + message.getRoomCode(), message);
 
 
     }
@@ -95,10 +96,10 @@ public class MessageController {
 
     @MessageMapping("/chat/message")
     public void message(chatFormat message, SimpMessageHeaderAccessor headerAccessor) {
-        Room r=roomList.findRoomByRoomId(message.getRoomId());
+        Room r=roomList.findRoomByRoomCode(message.getRoomCode());
         r.addChatMessage(message.getSender(), message.getMessage() );
-        log.info(message.getSender() + ": " +message.getMessage() + " , roomId: " +message.getRoomId());
-        template.convertAndSend("/sub/chat/message/" + message.getRoomId(), message);
+        log.info(message.getSender() + ": " +message.getMessage() + " , roomCode: " +message.getRoomCode());
+        template.convertAndSend("/sub/chat/message/" + message.getRoomCode(), message);
     }
 
 //
@@ -134,24 +135,26 @@ public class MessageController {
         boolean found = false;
         String userName = "";
         //모든 방 순회해서 해당 유저 찾아냄
-        for (int i = 0; i < roomList.getRoomList().size(); i++) {
+        Room r= roomList.findRoomBySessionId(sessionId);
 
 
-            List<Participant> rParticipants = roomList.getRoomList().get(i).getParticipants();
-            for (int j = 0; j < rParticipants.size(); j++) {
-                if (rParticipants.get(j).getSessionId().equals(sessionId)) {
-                    Participant p = rParticipants.get(j);
+        for (int i = 0; i < r.getParticipants().size(); i++) {
+
+
+                if (r.getParticipants().get(i).getSessionId().equals(sessionId)) {
+                    Participant p = r.getParticipants().get(i);
                     found = true;
                     //방장이면 방 폭파
-                    if (p.isHost()) {
-                        roomList.getRoomList().remove(i);
+                    if (r.getHostSessionId().equals(sessionId)) {
+                        roomList.deleteRoom(r);
+//                        roomList.getRoomList().remove(i);
                     } else {
-                        userName = rParticipants.get(j).getNickname();
-                        rParticipants.remove(j);
+                        userName = r.getParticipants().get(i).getNickname();
+                        r.getParticipants().remove(i);
                     }
                     break;
                 }
-            }
+
             if (found) break;
         }
 
@@ -166,7 +169,7 @@ public class MessageController {
 @AllArgsConstructor
 @NoArgsConstructor
 class chatFormat {
-    private String roomId;
+    private String roomCode;
     private String sender;
     private String message;
 }

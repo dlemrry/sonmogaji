@@ -3,29 +3,38 @@ package com.ssafy.sonmogaji.model.entity.room;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.log4j.Log4j2;
-import org.springframework.context.annotation.Bean;
-import org.springframework.stereotype.Component;
-import org.springframework.stereotype.Repository;
 
 import javax.annotation.PostConstruct;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Random;
 
 @Log4j2
 @Getter
 @Setter
 public class Room {
 
-    private String roomId; //방장 sessionId 와 동일
+    private String hostSessionId; //방장 sessionId 와 동일
+    private String roomCode;
     private List<ChatMessage> chatLog;
     private List<Participant> Participants;
     private boolean isStart;
 
-    public Room(String roomId) {
-        this.roomId = roomId;
+    public Room( String nickname) {
+        this.hostSessionId = "";
         this.chatLog=new LinkedList<>();
         this.isStart=false;
+        this.Participants=new LinkedList<>();
+        this.roomCode="";
+        //this.Participants.add(new Participant(nickname,hostSessionId));
+        Random rd = new Random();
+        for (int i = 0; i < 6; i++) {
+            this.roomCode+=rd.nextInt(9);
+        }
+        log.info("room created : "+ this.roomCode);
+        //roomcode 랜덤 6자리
+
     }
 
 //	public Room(String roomId){
@@ -39,17 +48,17 @@ public class Room {
         Participants = new ArrayList<>();
         chatLog = new ArrayList<>();
         isStart=false;
-        roomId="";
+        hostSessionId ="";
     }
 
-    public void addParticipant(MemorandumAction message, String sessionId) {
+    public void addParticipant(String nickname, String sessionId) {
         Participant Participant = new Participant();
         Participant.setSessionId(sessionId);
-        Participant.setNickname(message.getSenderNickName());
+        Participant.setNickname(nickname);
 
 
 
-        Participants.add(Participant);
+        this.Participants.add(Participant);
     }
 
 
@@ -65,7 +74,7 @@ public class Room {
     public boolean startRoom(String senderSessionId){
         for (int i = 0; i < this.Participants.size(); i++) {
             if(this.Participants.get(i).getSessionId()==senderSessionId){
-                if(this.getRoomId().equals(senderSessionId)){
+                if(this.getHostSessionId().equals(senderSessionId)){
                     this.isStart=true;
                     return true;
                 }

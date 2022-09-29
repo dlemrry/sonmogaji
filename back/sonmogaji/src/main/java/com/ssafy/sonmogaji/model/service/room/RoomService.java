@@ -9,4 +9,5 @@ public interface RoomService {
     public RoomResponseDto isAvail(String roomId);
 
 
+    public RoomResponseDto create( String senderNickname);
 }

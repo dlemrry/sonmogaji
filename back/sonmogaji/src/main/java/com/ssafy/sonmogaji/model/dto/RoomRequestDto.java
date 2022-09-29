@@ -10,5 +10,7 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 public class RoomRequestDto {
-    private String roomId;
+    private String roomCode;
+    private String senderNickName;
+
 }

@@ -10,7 +10,7 @@ import lombok.Setter;
 @AllArgsConstructor
 @NoArgsConstructor
 public class MemorandumAction {
-    private String roomId;
+    private String roomCode;
     private String senderNickName;
     private String senderSocketId;
     private String message;

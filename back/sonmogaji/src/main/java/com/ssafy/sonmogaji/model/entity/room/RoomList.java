@@ -1,14 +1,8 @@
 package com.ssafy.sonmogaji.model.entity.room;
 
 import lombok.Getter;
-import lombok.Setter;
-import lombok.extern.log4j.Log4j2;
-import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Component;
-import org.springframework.stereotype.Repository;
 
-import javax.annotation.PostConstruct;
-import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -19,15 +13,35 @@ public class RoomList{
     private static final List<Room> roomList = new LinkedList<>();
 
     public RoomList(){
-        roomList.add(new Room("testroom"));
+//        roomList.add(new Room("testroom"));
     }
     public List<Room> getRoomList (){
         return this.roomList;
     }
 
-    public Room findRoomByRoomId(String roomId){
+    public Room findRoomByHostId(String hostSessionId){
         for (int i = 0; i < this.roomList.size(); i++) {
-            if(this.roomList.get(i).getRoomId().equals(roomId)){
+            if(this.roomList.get(i).getHostSessionId().equals(hostSessionId)){
+                return this.roomList.get(i);
+            }
+        }
+        return null;
+    }
+    public Room findRoomBySessionId(String SessionId){
+        for (int i = 0; i < this.roomList.size(); i++) {
+            List<Participant> list = this.roomList.get(i).getParticipants();
+            for (int j = 0; j < list.size(); j++) {
+                if(list.get(j).getSessionId().equals(SessionId)){
+                    return this.roomList.get(i);
+                }
+            }
+        }
+
+        return null;
+    }
+    public Room findRoomByRoomCode(String roomCode){
+        for (int i = 0; i < this.roomList.size(); i++) {
+            if(this.roomList.get(i).getRoomCode().equals(roomCode)){
                 return this.roomList.get(i);
             }
         }
@@ -37,7 +51,7 @@ public class RoomList{
 
     public String deleteParticipant( String sessionId) {
 //    	List<Participant> gp = getParticipants(roomId);
-        Room r =findRoomByRoomId(sessionId);
+        Room r =findRoomByHostId(sessionId);
         //boolean flag = false;
 
         for(int i = 0; i< r.getParticipants().size(); i++) {
@@ -62,12 +76,22 @@ public class RoomList{
 
     public boolean deleteRoom(String roomId) {
         for (int i = 0; i < this.getRoomList().size(); i++) {
-            if(this.getRoomList().get(i).getRoomId().equals(roomId)){
+            if(this.getRoomList().get(i).getHostSessionId().equals(roomId)){
                 this.getRoomList().remove(i);
                 return true;
             }
         }
         return false;
+    }
+    public boolean deleteRoom(Room room) {
+        return this.getRoomList().remove(room);
+//        for (int i = 0; i < this.getRoomList().size(); i++) {
+//            if(this.getRoomList().get(i).getHostSessionId().equals(roomId)){
+//                this.getRoomList().remove(i);
+//                return true;
+//            }
+//        }
+//        return false;
     }
 
 }

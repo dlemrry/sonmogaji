@@ -16,4 +16,8 @@ public class Participant {
     private String sessionId;
     private String signUrl;
 
+    public Participant(String nickname, String sessionId){
+        this.nickname=nickname;
+        this.sessionId=sessionId;
+    }
 }

@@ -7,7 +7,7 @@ import lombok.Getter;
 @Getter
 @AllArgsConstructor
 public class RoomResponseDto {
-    private String roomId;
-    private String isAvail;
+    private String roomCode;
+    private String message;
 
 }
