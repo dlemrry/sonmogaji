@@ -17,13 +17,15 @@ import java.util.List;
 @Setter
 public class Room {
 
-    private String roomId;
+    private String roomId; //방장 sessionId 와 동일
     private List<ChatMessage> chatLog;
     private List<Participant> Participants;
+    private boolean isStart;
 
     public Room(String roomId) {
         this.roomId = roomId;
         this.chatLog=new LinkedList<>();
+        this.isStart=false;
     }
 
 //	public Room(String roomId){
@@ -36,7 +38,7 @@ public class Room {
     private void init(){
         Participants = new ArrayList<>();
         chatLog = new ArrayList<>();
-
+        isStart=false;
         roomId="";
     }
 
@@ -44,13 +46,7 @@ public class Room {
         Participant Participant = new Participant();
         Participant.setSessionId(sessionId);
         Participant.setNickname(message.getSenderNickName());
-        //방장이면
-        if(roomId.equals(sessionId)){
-            Participant.setHost(true);
-        }
-        else{
-            Participant.setHost(false);
-        }
+
 
 
         Participants.add(Participant);
@@ -58,21 +54,6 @@ public class Room {
 
 
 
-    public boolean deleteParticipant(int roomId, String sessionId) {
-//    	List<Participant> gp = getParticipants(roomId);
-
-        boolean flag = false;
-
-        for(int i = 0; i< Participants.size(); i++) {
-            //나간애면
-            if(Participants.get(i).getSessionId().equals(sessionId)) {
-
-                Participants.remove(Participants.get(i));
-            }
-        }
-
-        return flag;
-    }
 
     public void addChatMessage(String sender, String message){
 
@@ -81,7 +62,17 @@ public class Room {
     }
 
 
-
+    public boolean startRoom(String senderSessionId){
+        for (int i = 0; i < this.Participants.size(); i++) {
+            if(this.Participants.get(i).getSessionId()==senderSessionId){
+                if(this.getRoomId().equals(senderSessionId)){
+                    this.isStart=true;
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
 
 
 

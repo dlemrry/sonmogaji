@@ -15,6 +15,5 @@ public class Participant {
     private String nickname;
     private String sessionId;
     private String signUrl;
-    private boolean isHost;
 
 }

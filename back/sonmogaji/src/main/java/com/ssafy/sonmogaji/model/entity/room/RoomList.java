@@ -22,16 +22,52 @@ public class RoomList{
         roomList.add(new Room("testroom"));
     }
     public List<Room> getRoomList (){
-        return roomList;
+        return this.roomList;
     }
 
     public Room findRoomByRoomId(String roomId){
-        for (int i = 0; i < roomList.size(); i++) {
-            if(roomList.get(i).getRoomId().equals(roomId)){
-                return roomList.get(i);
+        for (int i = 0; i < this.roomList.size(); i++) {
+            if(this.roomList.get(i).getRoomId().equals(roomId)){
+                return this.roomList.get(i);
             }
         }
         return null;
+    }
+
+
+    public String deleteParticipant( String sessionId) {
+//    	List<Participant> gp = getParticipants(roomId);
+        Room r =findRoomByRoomId(sessionId);
+        //boolean flag = false;
+
+        for(int i = 0; i< r.getParticipants().size(); i++) {
+            //나간애면
+            if(r.getParticipants().get(i).getSessionId().equals(sessionId)) {
+                if(r.getParticipants().get(i).getSessionId().equals(sessionId)){
+                    //방 폭파
+                    this.deleteRoom(sessionId);
+
+                }else{
+                    r.getParticipants().remove(r.getParticipants().get(i));
+                    break;
+                }
+
+
+            }
+        }
+
+        return "deleted";
+    }
+
+
+    public boolean deleteRoom(String roomId) {
+        for (int i = 0; i < this.getRoomList().size(); i++) {
+            if(this.getRoomList().get(i).getRoomId().equals(roomId)){
+                this.getRoomList().remove(i);
+                return true;
+            }
+        }
+        return false;
     }
 
 }
