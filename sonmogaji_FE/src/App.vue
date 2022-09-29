@@ -1,35 +1,31 @@
 <template>
   <div id="app">
-    <nav>
+    <!-- <nav>
       <router-link to="/">Home</router-link> |
       <router-link to="/about">About</router-link>
       <router-link to="/beforeEnter">memorandum join</router-link>
     <router-link to="/beforeEnter">memorandum create</router-link>
     
     </nav>
-    <router-view/>
+    <router-view/> -->
+    <HeaderNavBar id="header" />
+    <RouterView id="section" />
+    <FooterBar></FooterBar>
   </div>
 </template>
 
+<script>
+import HeaderNavBar from "@/components/layout/HeaderNavBar.vue";
+import FooterBar from "@/components/layout/FooterBar.vue";
+export default {
+  name: "App",
+  components: {
+    HeaderNavBar,
+    FooterBar,
+  },
+};
+</script>
+
 <style>
-#app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-}
-
-nav {
-  padding: 30px;
-}
-
-nav a {
-  font-weight: bold;
-  color: #2c3e50;
-}
-
-nav a.router-link-exact-active {
-  color: #42b983;
-}
+@import "@/assets/css/main.css";
 </style>
