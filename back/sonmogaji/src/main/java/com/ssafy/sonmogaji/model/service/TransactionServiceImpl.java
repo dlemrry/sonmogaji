@@ -13,7 +13,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.ssafy.sonmogaji.model.dto.SigneeDto;
 import com.ssafy.sonmogaji.model.dto.TransactionDto;
 import com.ssafy.sonmogaji.model.entity.Member;
 import com.ssafy.sonmogaji.model.entity.Signee;
@@ -76,7 +75,7 @@ public class TransactionServiceImpl implements TransactionService {
 	@Override
 	public List<TransactionDto> readAllMyTransaction(String memberAddress, Pageable pageable) {
 		
-		Member member = memberRepository.findByMemberAddress(memberAddress).get(0);
+		Member member = memberRepository.findByMemberAddress(memberAddress).orElseGet(Member :: new);
 		
 		List<TransactionDto> readTransactionDtos = new ArrayList<>();
 		List<Signee> signees = signeeRepository.findByMember(member);
@@ -135,7 +134,7 @@ public class TransactionServiceImpl implements TransactionService {
 		// 각서 서명인들 저장
 		List<String> signeeDtos = transactionDto.getSignees(); 
 		for(String signeeDto : signeeDtos) {
-			Member member = memberRepository.findByMemberAddress(signeeDto).get(0);
+			Member member = memberRepository.findByMemberAddress(signeeDto).orElseGet(Member :: new);
 			Signee signee = Signee.builder().member(member).transaction(transaction).build();
 			signeeRepository.save(signee);
 		}
