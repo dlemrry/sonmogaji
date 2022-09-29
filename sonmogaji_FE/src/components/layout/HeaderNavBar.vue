@@ -1,7 +1,7 @@
 <template>
   <b-navbar class="px-5">
     <b-navbar-brand href="#">
-      <img src="@/assets/logos/logo.png" width="200px" alt="sonmogaji" />
+      <img src="@/assets/logos/logo.png" width="200px" alt="sonmogaji" @click="toHome"/>
     </b-navbar-brand>
     <b-navbar-nav class="w-100"></b-navbar-nav>
     <b-navbar-nav class="ml-auto">
@@ -38,6 +38,9 @@ export default {
       this.SET_ACCOUNT(null);
       if (this.$route.path != "/") this.$router.push({ name: "home" });
     },
+    toHome(){
+      this.$router.push({name:"home"})
+    }
   },
 };
 </script>

@@ -24,11 +24,11 @@
             </div>
             <div class="d-flex justify-content-center text-center">
               <div class="mx-auto">
-                <b-icon class="icon-button mx-auto" icon="plus-square-dotted" />
+                <b-icon class="icon-button mx-auto" icon="plus-square-dotted" @click="createRoom"/>
                 <p class="fw-light">방 생성하기</p>
               </div>
               <div class="mx-auto">
-                <b-icon class="icon-button mx-auto" icon="search" />
+                <b-icon class="icon-button mx-auto" icon="search"  @click="joinRoom"/>
                 <p class="fw-light">방 참여하기</p>
               </div>
             </div>
@@ -63,6 +63,12 @@ export default {
       window.scrollTo({ left: 0, top: screen.height - 100, behavior: "smooth" });
       console.log("hi");
     },
+    createRoom(){
+      this.$router.push({name:"createRoom"})
+    },
+    joinRoom(){
+      this.$router.push({name:"beforeEnter"})
+    }
   },
 };
 </script>
@@ -75,5 +81,6 @@ export default {
   width: 60px;
   height: 60px;
   color: white;
+  cursor: pointer;
 }
 </style>

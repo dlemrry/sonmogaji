@@ -25,8 +25,9 @@ export default {
   },
   created() {
     console.log("sessionMain");
-    this.enterRoomId("testroom")
+    // this.enterRoomId("testroom")
     this.stompConnect();
+    //stomp room join
   },
   methods: {
     ...mapActions(["stompConnect","enterRoomId"]),

@@ -2,7 +2,7 @@
 import axios from 'axios'
 
 
-const socketStore = {
+const apiStore = {
     namespaced: true,
     state: {
       axios:{}
@@ -27,4 +27,4 @@ const socketStore = {
     },
   };
   
-  export default socketStore;
+  export default apiStore;

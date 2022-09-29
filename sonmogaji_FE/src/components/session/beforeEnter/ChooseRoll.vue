@@ -17,7 +17,7 @@
       </b-col>
       <b-col>
         <b-card
-         @click="chooseObserver()"
+          @click="chooseObserver()"
           title="관전자"
           :img-src="require('../../../assets/usergroup.png')"
           img-alt="Image"
@@ -35,32 +35,61 @@
 
 <script>
 import { mapState, mapActions, mapGetters } from "vuex";
+import axios from "axios";
 export default {
   name: "ChooseRoll",
   components: {},
-  computed:{
+  computed: {
     ...mapState(["roll"]),
-    ...mapGetters(["getRoll"]),
+    ...mapGetters(["getRoll", "getSenderNickName", "getRoomCode"]),
   },
   created() {},
   mounted() {
     console.log("ChooseRoll");
   },
   data() {
-    return {
-     
-    };
+    return {};
   },
   methods: {
-    ...mapActions(["enterRoll"]),
-    chooseSignee(){
-        this.enterRoll("signee");
-        this.$router.push({name:"session"})
+    ...mapActions(["enterRoll", "enterRoomCode"]),
+    chooseSignee() {
+      console.log(this.getRoomCode)
+      console.log(this.getSenderNickName)
+      axios
+        .post("http://localhost:8080/api/room/isAvail", {
+          roomCode: this.getRoomCode,
+          senderNickName: this.getSenderNickName,
+        })
+        .then((response) => {
+          console.log(response.data);
+          this.enterRoll("signee");
+          
+
+          this.$router.push({ name: "session" });
+        })
+        .catch((error) => {
+          console.log(error);
+        })
+        .finally(() => {});
     },
-    chooseObserver(){
-        this.enterRoll("observer")
-        this.$router.push({name:"session"})
-    }
+    chooseObserver() {
+     axios
+        .post("http://localhost:8080/api/room/isAvail", {
+          roomCode: this.getRoomCode,
+          senderNickName: this.getSenderNickName,
+        })
+        .then((response) => {
+          console.log(response.data);
+          this.enterRoll("observer");
+          
+
+          this.$router.push({ name: "session" });
+        })
+        .catch((error) => {
+          console.log(error);
+        })
+        .finally(() => {});
+    },
   },
 };
 </script>
