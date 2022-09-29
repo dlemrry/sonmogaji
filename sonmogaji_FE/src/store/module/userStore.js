@@ -34,7 +34,6 @@ const userStore = {
       this.address = accounts[0];
       this.isLoggedIn = true;
       console.log(this.isLoggedIn);
-      this.switchNetwork();
     },
     async switchNetwork() {
       try {

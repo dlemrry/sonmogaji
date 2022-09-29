@@ -1,6 +1,8 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
-import HomeView from '../views/HomeView.vue'
+import HomeView from '@/views/HomeView.vue'
+import UserView from '@/views/UserView.vue';
+
 //import sessionMain from '../views/session/SessionMain.vue'
 import sessionMain1 from '../components/session/sessionmain1/SessionMain1.vue'
 
@@ -11,6 +13,23 @@ const routes = [
     path: '/',
     name: 'home',
     component: HomeView
+  },
+  {
+    path: '/user',
+    name: 'user',
+    component: UserView,
+    children: [
+      {
+        path: 'login',
+        name: 'login',
+        component: () => import( '@/components/user/MetamaskLogin.vue'),
+      },
+      {
+        path: 'myPage',
+        name: 'myPage',
+        component: () => import( '@/components/user/MyPage.vue'),
+      },
+    ]
   },
   {
     path: '/about',
