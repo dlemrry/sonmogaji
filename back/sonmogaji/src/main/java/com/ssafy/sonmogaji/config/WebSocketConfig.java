@@ -3,12 +3,14 @@ package com.ssafy.sonmogaji.config;
 import com.ssafy.sonmogaji.handler.CustomHandshakeHandler;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.messaging.simp.config.MessageBrokerRegistry;
+import org.springframework.web.socket.config.annotation.EnableWebSocket;
 import org.springframework.web.socket.config.annotation.EnableWebSocketMessageBroker;
 import org.springframework.web.socket.config.annotation.StompEndpointRegistry;
 import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerConfigurer;
 
 @EnableWebSocketMessageBroker //Stomp사용하기 위해서 선언
 @Configuration
+@EnableWebSocket
 //Stomp사용 = WebSocketMessageBrokerConfigurer 상속
 //WebSocket사용 = WebSocketConfigurer 상속
 public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
