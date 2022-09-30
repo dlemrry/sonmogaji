@@ -4,7 +4,7 @@ import SockJS from "sockjs-client";
 
 const socketStore = {
   state: {
-    roomId: "",
+    roomCode: "",
     senderNickName: "",
     roll: "",
     socket: {},
@@ -14,8 +14,8 @@ const socketStore = {
   },
 
   getters: {
-    getRoomId(state) {
-      return state.stomp;
+    getRoomCode(state) {
+      return state.roomCode;
     },
     getSenderNickName(state) {
       return state.senderNickName;
@@ -38,8 +38,8 @@ const socketStore = {
   },
 
   mutations: {
-    setRoomId(state, roomId) {
-      state.roomId = roomId;
+    setRoomCode(state, roomCode) {
+      state.roomCode = roomCode;
     },
     setSenderNickName(state, senderNickName) {
       state.senderNickName = senderNickName;
@@ -74,36 +74,36 @@ const socketStore = {
     enterRoll({ commit, state }, roll) {
       commit("setRoll", roll);
     },
-    enterRoomId({ commit, state }, roomId) {
-      commit("setRoomId", roomId);
+    enterRoomCode({ commit, state }, roomCode) {
+      commit("setRoomCode", roomCode);
     },
     roomCreate({ commit, state }) {
-      state.stomp.send(
-        "/pub/memorandum/create",
-        {},
-        JSON.stringify({
-          roomId: state.roomId,
-        })
-      );
+      // state.stomp.send(
+      //   "/pub/memorandum/create",
+      //   {},
+      //   JSON.stringify({
+      //     senderNickName: state.senderNickName
+      //   })
+      // );
     },
 
-    // roomJoin({ commit, state },roomId) {
+    // roomJoin({ commit, state },roomCode) {
     //   state.stomp.send(
     //     "/pub/memorandum/join",
     //     {},
     //     JSON.stringify({
-    //       roomId: roomId,
+    //       roomCode: roomCode,
     //       senderNickname:state.nickname
     //     })
     //   );
-    //   commit("setRoomId", roomId)
+    //   commit("setRoomCode", roomCode)
     // },
     roomStart({ commit, state }) {
       state.stomp.send(
         "/pub/memorandum/start",
         {},
         JSON.stringify({
-          roomId: state.roomId,
+          roomCode: state.roomCode,
         })
       );
     },
@@ -112,7 +112,7 @@ const socketStore = {
         "/pub/memorandum/action",
         {},
         JSON.stringify({
-          roomId: state.roomId,
+          roomCode: state.roomCode,
         })
       );
     },
@@ -124,7 +124,7 @@ const socketStore = {
         JSON.stringify({
           sender: state.senderNickName,
           message: message,
-          roomId: state.roomId,
+          roomCode: state.roomCode,
         })
       );
     },
@@ -139,7 +139,6 @@ const socketStore = {
       // let socket = new SockJS(serverURL);
       commit("setSocket", new SockJS(serverURL));
       console.log(state.socket);
-      // let stompClient = Stomp.over(state.socket);
       console.log("param nick : " + state.senderNickName);
 
       commit("setStomp", Stomp.over(state.socket));
@@ -147,36 +146,30 @@ const socketStore = {
       state.stomp.connect(
         {},
         () => {
-          // 소켓 연결 성공
           state.stomp.connected = true;
 
           commit("setStomp", state.stomp);
-          //commit("setSenderNickName", state.senderNickName);
-          //commit("setRoomId", roomId);
           commit("setChatmessages", [{}, {}]);
           console.log(state.chatmessages);
-          console.log("소켓 연결 성공" + state.senderNickName + " " + state.roomId);
+          console.log("소켓 연결 성공" + state.senderNickName + " " + state.roomCode);
           state.stomp.send(
             "/pub/memorandum/join",
             {},
             JSON.stringify({
-              roomId: state.roomId,
+              roomCode: state.roomCode,
               senderNickName: state.senderNickName,
             })
           );
 
-          state.stomp.subscribe("/sub/memorandum/join/" + state.roomId, (res) => {
+          state.stomp.subscribe("/sub/memorandum/join/" + state.roomCode, (res) => {
             var content = JSON.parse(res.body);
-            console.log(content)
-            //commit("setRoomId",content.roomId)
-            console.log(content.chatLog);
-            commit("setChatmessages", content.chatLog);
+            console.log(content);
           });
-          state.stomp.subscribe("/sub/memorandum/action/" + state.roomId, (res) => {
+          state.stomp.subscribe("/sub/memorandum/action/" + state.roomCode, (res) => {
             var content = JSON.parse(res.body);
           });
 
-          state.stomp.subscribe("/sub/chat/message/" + state.roomId, (res) => {
+          state.stomp.subscribe("/sub/chat/message/" + state.roomCode, (res) => {
             var content = JSON.parse(res.body);
 
             commit("receiveChatmessages", { sender: content.sender, message: content.message });
@@ -184,10 +177,16 @@ const socketStore = {
         },
         (error) => {
           // 소켓 연결 실패
+          // 소켓 연결 끊김
           console.log("소켓 연결 실패", error);
         }
       );
     },
+    stompDisconnect({commit,state}){
+      state.stomp.disconnect();
+      console.log("disconnect")
+      commit("setStomp", state.stomp);
+    }
   },
 };
 

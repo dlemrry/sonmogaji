@@ -12,7 +12,7 @@
           <b-col
             ><b-card
               title="블록체인으로 박제!"
-              :img-src="require('../../../assets/chain.png')"
+              :img-src="require('../../../assets/icons/chain.png')"
               img-alt="Image"
               img-top
               tag="article"
@@ -27,7 +27,7 @@
           <b-col
             ><b-card
               title="나만의 각서 이미지!"
-              :img-src="require('../../../assets/folder.png')"
+              :img-src="require('../../../assets/icons/folder.png')"
               img-alt="Image"
               img-top
               tag="article"
@@ -42,7 +42,7 @@
           <b-col>
             <b-card
               title="실시간으로 함께 작성!"
-              :img-src="require('../../../assets/chat.png')"
+              :img-src="require('../../../assets/icons/chat.png')"
               img-alt="Image"
               img-top
               tag="article"

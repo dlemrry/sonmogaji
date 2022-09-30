@@ -2,14 +2,16 @@ import Vue from "vue";
 import Vuex from "vuex";
 import createPersistedState from "vuex-persistedstate";
 
-import apiStore from "./module/apiStore";
+import apiStore from "@/store/module/apiStore";
+import socketStore from "@/store/module/socketStore";
+import userStore from "@/store/module/userStore";
 
-import socketStore from './module/socketStore';
-Vue.use(Vuex)
+Vue.use(Vuex);
 const store = new Vuex.Store({
   modules: {
     apiStore,
-    socketStore
+    socketStore,
+    userStore,
   },
   plugins: [
     createPersistedState({
