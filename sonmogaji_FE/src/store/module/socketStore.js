@@ -82,7 +82,6 @@ const socketStore = {
       //   "/pub/memorandum/create",
       //   {},
       //   JSON.stringify({
-          
       //     senderNickName: state.senderNickName
       //   })
       // );
@@ -136,10 +135,8 @@ const socketStore = {
     stompConnect({ commit, state }) {
       // const serverURL = "https://j7a308.p.ssafy.io/room";
       const serverURL = "http://localhost:8080/room";
-      // let socket = new SockJS(serverURL);
       commit("setSocket", new SockJS(serverURL));
       console.log(state.socket);
-      // let stompClient = Stomp.over(state.socket);
       console.log("param nick : " + state.senderNickName);
 
       commit("setStomp", Stomp.over(state.socket));
@@ -147,12 +144,9 @@ const socketStore = {
       state.stomp.connect(
         {},
         () => {
-          // 소켓 연결 성공
           state.stomp.connected = true;
 
           commit("setStomp", state.stomp);
-          //commit("setSenderNickName", state.senderNickName);
-          //commit("setRoomCode", roomCode);
           commit("setChatmessages", [{}, {}]);
           console.log(state.chatmessages);
           console.log("소켓 연결 성공" + state.senderNickName + " " + state.roomCode);
@@ -167,10 +161,7 @@ const socketStore = {
 
           state.stomp.subscribe("/sub/memorandum/join/" + state.roomCode, (res) => {
             var content = JSON.parse(res.body);
-            console.log(content)
-            //commit("setRoomCode",content.roomCode)
-            // console.log(content.chatLog);
-            // commit("setChatmessages", content.chatLog);
+            console.log(content);
           });
           state.stomp.subscribe("/sub/memorandum/action/" + state.roomCode, (res) => {
             var content = JSON.parse(res.body);
@@ -184,10 +175,16 @@ const socketStore = {
         },
         (error) => {
           // 소켓 연결 실패
+          // 소켓 연결 끊김
           console.log("소켓 연결 실패", error);
         }
       );
     },
+    stompDisconnect({commit,state}){
+      state.stomp.disconnect();
+      console.log("disconnect")
+      commit("setStomp", state.stomp);
+    }
   },
 };
 

@@ -29,8 +29,12 @@ export default {
     this.stompConnect();
     //stomp room join
   },
+  destroyed(){
+    console.log('disconnect')
+    this.stompDisconnect();
+  },
   methods: {
-    ...mapActions(["stompConnect","enterRoomId"]),
+    ...mapActions(["stompConnect","enterRoomId","stompDisconnect"]),
   },
 };
 </script>

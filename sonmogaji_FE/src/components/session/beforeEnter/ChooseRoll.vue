@@ -53,8 +53,8 @@ export default {
   methods: {
     ...mapActions(["enterRoll", "enterRoomCode"]),
     chooseSignee() {
-      console.log(this.getRoomCode)
-      console.log(this.getSenderNickName)
+      console.log(this.getRoomCode);
+      console.log(this.getSenderNickName);
       axios
         .post("http://localhost:8080/api/room/isAvail", {
           roomCode: this.getRoomCode,
@@ -63,17 +63,22 @@ export default {
         .then((response) => {
           console.log(response.data);
           this.enterRoll("signee");
+          if(response.data.message=="yes"){
+            this.$router.push({ name: "session" });
+          }
+          else{
+            alert("방이 존재하지 않습니다")
+          }
           
-
-          this.$router.push({ name: "session" });
         })
         .catch((error) => {
+          // alert("방이 존재하지 않습니다");
           console.log(error);
         })
         .finally(() => {});
     },
     chooseObserver() {
-     axios
+      axios
         .post("http://localhost:8080/api/room/isAvail", {
           roomCode: this.getRoomCode,
           senderNickName: this.getSenderNickName,
@@ -81,12 +86,12 @@ export default {
         .then((response) => {
           console.log(response.data);
           this.enterRoll("observer");
-          
 
           this.$router.push({ name: "session" });
         })
         .catch((error) => {
           console.log(error);
+          alert("방이 존재하지 않습니다");
         })
         .finally(() => {});
     },
