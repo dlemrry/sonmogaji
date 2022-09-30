@@ -36,6 +36,19 @@ public class Room {
         //roomcode 랜덤 6자리
 
     }
+    public Room( String nickname,String hostSessionId) {
+        this.hostSessionId = hostSessionId;
+        this.chatLog=new LinkedList<>();
+        this.isStart=false;
+        this.Participants=new LinkedList<>();
+        this.roomCode="";
+        Random rd = new Random();
+        for (int i = 0; i < 6; i++) {
+            this.roomCode+=rd.nextInt(9);
+        }
+        log.info("room created : "+ this.roomCode);
+
+    }
 
 //	public Room(String roomId){
 //		this.roomId=roomId;

@@ -4,11 +4,13 @@ import com.ssafy.sonmogaji.model.entity.room.*;
 import lombok.*;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.event.EventListener;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.socket.messaging.SessionDisconnectEvent;
 
 import java.util.List;
 
@@ -46,7 +48,11 @@ public class MessageController {
     public void join(MemorandumAction message, SimpMessageHeaderAccessor headerAccessor) throws InterruptedException {
 //        log.info(message.getSenderNickName() + " join");
         Room r = roomList.findRoomByRoomCode(message.getRoomCode());
+        if(r.getParticipants().size()<1){
+            r.setHostSessionId(headerAccessor.getSessionId());
+        }
         log.info(message.getSenderNickName() + " join into " +r.getRoomCode());
+        log.info(headerAccessor.getSessionId());
         r.addParticipant(message.getSenderNickName(),headerAccessor.getSessionId());
         message.setRoomCode(message.getRoomCode());
         message.setMessage("joined" +message.getRoomCode());
@@ -130,33 +136,11 @@ public class MessageController {
 //	}
 
     //소켓 끊김 감지
-    public void onDisconnectEvent(String sessionId) {
-
-        boolean found = false;
-        String userName = "";
-        //모든 방 순회해서 해당 유저 찾아냄
-        Room r= roomList.findRoomBySessionId(sessionId);
-
-
-        for (int i = 0; i < r.getParticipants().size(); i++) {
-
-
-                if (r.getParticipants().get(i).getSessionId().equals(sessionId)) {
-                    Participant p = r.getParticipants().get(i);
-                    found = true;
-                    //방장이면 방 폭파
-                    if (r.getHostSessionId().equals(sessionId)) {
-                        roomList.deleteRoom(r);
-//                        roomList.getRoomList().remove(i);
-                    } else {
-                        userName = r.getParticipants().get(i).getNickname();
-                        r.getParticipants().remove(i);
-                    }
-                    break;
-                }
-
-            if (found) break;
-        }
+    @EventListener
+    public void onDisconnectEvent(SessionDisconnectEvent event) {
+        String sessionId=event.getSessionId();
+        log.info( "disconnect : " +sessionId);
+        log.info( roomList.deleteParticipant(sessionId));
 
 
     }

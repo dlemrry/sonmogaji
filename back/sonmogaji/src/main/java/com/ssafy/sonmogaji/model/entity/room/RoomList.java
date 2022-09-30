@@ -1,6 +1,7 @@
 package com.ssafy.sonmogaji.model.entity.room;
 
 import lombok.Getter;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Component;
 
 import java.util.LinkedList;
@@ -8,6 +9,7 @@ import java.util.List;
 
 @Component
 @Getter
+@Log4j2
 public class RoomList{
 
     private static final List<Room> roomList = new LinkedList<>();
@@ -51,26 +53,30 @@ public class RoomList{
 
     public String deleteParticipant( String sessionId) {
 //    	List<Participant> gp = getParticipants(roomId);
-        Room r =findRoomByHostId(sessionId);
+        Room r =findRoomBySessionId(sessionId);
         //boolean flag = false;
+        if(r.getHostSessionId().equals(sessionId)){
+
+            //방장이면 방 폭파
+            this.deleteRoom(sessionId);
+            log.info("room "+r.getRoomCode() + " deleted");
+            return "room deleted";
+        }
 
         for(int i = 0; i< r.getParticipants().size(); i++) {
             //나간애면
             if(r.getParticipants().get(i).getSessionId().equals(sessionId)) {
-                if(r.getParticipants().get(i).getSessionId().equals(sessionId)){
-                    //방 폭파
-                    this.deleteRoom(sessionId);
-
-                }else{
+                log.info("user "+r.getParticipants().get(i).getNickname() + " deleted");
                     r.getParticipants().remove(r.getParticipants().get(i));
+
                     break;
-                }
+
 
 
             }
         }
 
-        return "deleted";
+        return "user deleted";
     }
 
 

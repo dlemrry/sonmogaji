@@ -39,7 +39,8 @@ public class RoomController {
 //			String token = memberService.login(memberAddress);
 //			response.setHeader("authorization", "bearer " + token);
 
-            return new ResponseEntity<RoomResponseDto>(responseDto, HttpStatus.OK);
+                return new ResponseEntity<RoomResponseDto>(responseDto, HttpStatus.OK);
+
         } catch (Exception e) {
             return exceptionHandling(e);
         }

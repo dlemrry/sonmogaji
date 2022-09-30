@@ -24,7 +24,7 @@ public class RoomServiceImpl implements RoomService {
 
 		Room r = roomList.findRoomByRoomCode(roomCode);
 		if(r==null) {
-			return new RoomResponseDto(roomCode, "no");
+			return new RoomResponseDto(roomCode, "notExist");
 
 		}
 
@@ -34,8 +34,19 @@ public class RoomServiceImpl implements RoomService {
 	@Override
 	public RoomResponseDto create(String senderNickname) {
 		log.info(senderNickname + " created room");
-		Room newroom = new Room(senderNickname);
-		//newroom.setHostSessionId(headerAccessor.getSessionId());
+		Room newroom=null;
+		//중복확인
+		while(true){
+			newroom = new Room(senderNickname);
+			if(roomList.findRoomByRoomCode(newroom.getRoomCode())!=null){
+				//중복이면 다시 만듬
+				continue;
+			}
+			else{
+				break;
+			}
+		}
+
 		roomList.getRoomList().add(newroom);
 		return new RoomResponseDto(newroom.getRoomCode(), "created");
 	}
