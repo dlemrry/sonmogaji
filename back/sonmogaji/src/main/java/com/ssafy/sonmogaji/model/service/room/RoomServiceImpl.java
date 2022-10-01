@@ -16,39 +16,38 @@ import org.springframework.transaction.annotation.Transactional;
 @Log4j2
 public class RoomServiceImpl implements RoomService {
 
-	@Autowired
-	private RoomList roomList;
+    @Autowired
+    private RoomList roomList;
 
-	@Override
-	public RoomResponseDto isAvail(String roomCode) {
+    @Override
+    public RoomResponseDto isAvail(String roomCode) {
 
-		Room r = roomList.findRoomByRoomCode(roomCode);
-		if(r==null) {
-			return new RoomResponseDto(roomCode, "notExist");
+        Room r = roomList.findRoomByRoomCode(roomCode);
+        if (r == null) {
+            return new RoomResponseDto(roomCode, "notExist");
 
-		}
+        }
 
-		return new RoomResponseDto(r.getRoomCode(), "yes");
-	}
+        return new RoomResponseDto(r.getRoomCode(), "yes");
+    }
 
-	@Override
-	public RoomResponseDto create(String senderNickname) {
-		log.info(senderNickname + " created room");
-		Room newroom=null;
-		//중복확인
-		while(true){
-			newroom = new Room(senderNickname);
-			if(roomList.findRoomByRoomCode(newroom.getRoomCode())!=null){
-				//중복이면 다시 만듬
-				continue;
-			}
-			else{
-				break;
-			}
-		}
+    @Override
+    public RoomResponseDto create(String senderNickname) {
+        log.info(senderNickname + " created room");
+        Room newroom = null;
+        //중복확인
+        while (true) {
+            newroom = new Room(senderNickname);
+            if (roomList.findRoomByRoomCode(newroom.getRoomCode()) != null) {
+                //중복이면 다시 만듬
+                continue;
+            } else {
+                break;
+            }
+        }
 
-		roomList.getRoomList().add(newroom);
-		return new RoomResponseDto(newroom.getRoomCode(), "created");
-	}
+        roomList.getRoomList().add(newroom);
+        return new RoomResponseDto(newroom.getRoomCode(), "created");
+    }
 
 }

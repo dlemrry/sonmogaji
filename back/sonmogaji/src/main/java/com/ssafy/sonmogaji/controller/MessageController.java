@@ -11,54 +11,61 @@ import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.socket.messaging.SessionDisconnectEvent;
+import org.web3j.abi.datatypes.Bool;
+import org.web3j.crypto.Hash;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Controller
 @RequiredArgsConstructor
 @Log4j2
 @CrossOrigin("*")
-//@Profile("stomp")
 public class MessageController {
 
     // 메세지를 보내는 양식을 지정해둔 template
     // 이걸 사용하면 편하게 메세지를 클라이언트쪽으로 보낼 수 있음.
     @Autowired
     private final SimpMessagingTemplate template;
-    //	@Autowired
-//	private RoomRepository roomRepository;
-//
-    //싱글톤 방 리스트
-//    private static final List<Room> roomList = new LinkedList<>();
     @Autowired
     private RoomList roomList;
 
 
-//    @MessageMapping(value = "/memorandum/create")
-//    public void create(MemorandumAction message, SimpMessageHeaderAccessor headerAccessor) throws InterruptedException {
-//        log.info(message.getSenderNickName() + " created room");
-//        Room newroom = new Room(headerAccessor.getSessionId(),message.getSenderNickName());
-//        //newroom.setHostSessionId(headerAccessor.getSessionId());
-//        roomList.getRoomList().add(newroom);
-//        template.convertAndSend("/sub/memorandum/join/" + message.getRoomCode(), message);
-//
-//    }
     @MessageMapping(value = "/memorandum/join")
     // headerAccessor는 소켓서버의 주인ID를 확인하기 위해서 사용
     public void join(MemorandumAction message, SimpMessageHeaderAccessor headerAccessor) throws InterruptedException {
 //        log.info(message.getSenderNickName() + " join");
         Room r = roomList.findRoomByRoomCode(message.getRoomCode());
-        if(r.getParticipants().size()<1){
+        if (r.getParticipants().size() < 1) {
             r.setHostSessionId(headerAccessor.getSessionId());
         }
-        log.info(message.getSenderNickName() + " join into " +r.getRoomCode());
-        log.info(headerAccessor.getSessionId());
-        r.addParticipant(message.getSenderNickName(),headerAccessor.getSessionId());
-        message.setRoomCode(message.getRoomCode());
-        message.setMessage("joined" +message.getRoomCode());
-        template.convertAndSend("/sub/memorandum/join/" + message.getRoomCode(), message);
+        if (r.isStart()) {
+            message.setRoomCode(message.getRoomCode());
+            message.setMessage("no" + message.getRoomCode());
+            template.convertAndSendToUser(headerAccessor.getSessionId(), "/sub/memorandum/join/" + message.getRoomCode(), message);
+        } else {
+            log.info(message.getSenderNickName() + " join into " + r.getRoomCode());
+            log.info(headerAccessor.getSessionId());
+            r.addParticipant(message.getSenderNickName(), headerAccessor.getSessionId());
+            MemorandumState state=r.getMemorandumState();
+//            HashMap<String,Boolean>[] agreearray=state.getAgree();
+            List<Map<String, Boolean>> agreelist = state.getAgree();
+//            HashMap<String, Boolean> agree = r.getMemorandumState().getAgree().get(0);
+//            log.info(agreelist.get(0));
+            agreelist.get(0).put(headerAccessor.getSessionId(),false);
+            agreelist.get(1).put(headerAccessor.getSessionId(),false);
+            agreelist.get(2).put(headerAccessor.getSessionId(),false);
+            agreelist.get(3).put(headerAccessor.getSessionId(),false);
+            agreelist.get(4).put(headerAccessor.getSessionId(),false);
+            agreelist.get(5).put(headerAccessor.getSessionId(),false);
 
-
+            r.getMemorandumState().getSign().put(headerAccessor.getSessionId(), "");
+            message.setRoomCode(message.getRoomCode());
+            message.setMemorandumState(r.getMemorandumState());
+            message.setMessage("ok");
+            template.convertAndSend("/sub/memorandum/join/" + message.getRoomCode(), message);
+        }
     }
 
     @MessageMapping(value = "/memorandum/action")
@@ -68,84 +75,104 @@ public class MessageController {
 
         template.convertAndSend("/sub/memorandum/action/" + message.getRoomCode(), message);
 
+    }
 
+    @MessageMapping(value = "/memorandum/start")
+    // headerAccessor는 소켓서버의 주인ID를 확인하기 위해서 사용
+    public void start(MemorandumAction message, SimpMessageHeaderAccessor headerAccessor) throws InterruptedException {
+
+        Room r = roomList.findRoomByRoomCode(message.getRoomCode());
+        if (r.startRoom(headerAccessor.getSessionId())) {
+            log.info(message.getRoomCode() + " start");
+            message.setMessage("start");
+            message.setMemorandumState(r.getMemorandumState());
+            template.convertAndSend("/sub/memorandum/start/" + message.getRoomCode(), message);
+        } else {
+            message.setMessage("you are not host");
+            template.convertAndSendToUser(headerAccessor.getSessionId(), "/sub/memorandum/start/" + message.getRoomCode(), message);
+        }
     }
 
 
-    // 클라이언트에서 메세지가 날라왔다.
-//	@MessageMapping(value = "/memorandum")
-//	// headerAccessor는 소켓서버의 주인ID를 확인하기 위해서 사용
-//	public void memo(MemorandumMessage message, SimpMessageHeaderAccessor headerAccessor) throws InterruptedException {
-//		log.info(message.getType());
-//		//이 방에서 게임하고있는 플레이어들
-//		List<MemorandumParticipant> gpList = roomParticipantRepository.getMemorandumParticipant(message.getRoomId());
-//
-//		if (message.getType().equals("join")) {
-//			message.setType("join");
-//			template.convertAndSend("/memorandum" + message.getRoomId(), message);
-//
-//		}
-//
-//		// 게임이 시작버튼이 눌렸다.
-//		if (message.getType().equals("vote")) {
-//			message.setType("vote");
-//			template.convertAndSend("/memorandum" + message.getRoomId(), message);
-//
-//		}
-//
-//
-//
-//	}
+    @MessageMapping(value = "/memorandum/vote")
+    public void vote(MemorandumAction message, SimpMessageHeaderAccessor headerAccessor) throws InterruptedException {
 
-    //roomId는 방장 id로
+        Room r = roomList.findRoomByRoomCode(message.getRoomCode());
+        if (r.getHostSessionId().equals(headerAccessor.getSessionId())) {
+            message.setMessage("you are host");
+            template.convertAndSendToUser(headerAccessor.getSessionId(), "/sub/memorandum/vote/" + message.getRoomCode(), message);
+
+        } else {
+//            HashMap<String, Boolean> agree = r.getMemorandumState().getAgree().get(Integer.parseInt(message.getMessage()));
+//            agree.put(headerAccessor.getSessionId(), !agree.get(headerAccessor.getSessionId()));
+            int index=Integer.parseInt(message.getMessage());
+            Map<String, Boolean> agree = r.getMemorandumState().getAgree().get(index);
+            agree.put(headerAccessor.getSessionId(), !agree.get(headerAccessor.getSessionId()));
+            message.setMemorandumState(r.getMemorandumState());
+            message.setMessage(Integer.toString(index+1));
+            template.convertAndSend("/sub/memorandum/vote/" + message.getRoomCode(), message);
+        }
+
+    }
+
+    @MessageMapping(value = "/memorandum/next")
+    public void next(MemorandumAction message, SimpMessageHeaderAccessor headerAccessor) throws InterruptedException {
+
+        Room r = roomList.findRoomByRoomCode(message.getRoomCode());
+        if (!r.getHostSessionId().equals(headerAccessor.getSessionId())) {
+            message.setMessage("you are not host");
+            template.convertAndSendToUser(headerAccessor.getSessionId(), "/sub/memorandum/vote/" + message.getRoomCode(), message);
+
+        } else {
+//            HashMap<String, Boolean> agree = r.getMemorandumState().getAgree().get(Integer.parseInt(message.getMessage()));
+//            agree.put(headerAccessor.getSessionId(), !agree.get(headerAccessor.getSessionId()));
+
+            //Map<String, Boolean> agree = r.getMemorandumState().getAgree().get(Integer.parseInt(message.getMessage()));
+            //agree.put(headerAccessor.getSessionId(), !agree.get(headerAccessor.getSessionId()));
+            int index= Integer.parseInt(message.getMessage())-1;
+            Map<String, Boolean> agreemap = r.getMemorandumState().getAgree().get(index);
+            int participantCount=r.getParticipants().size();
+            int count=0;
+            for( Map.Entry<String, Boolean> elem : agreemap.entrySet() ){
+                if(elem.getValue()){
+                    count++;
+                }
+            }
+
+            if(count==(participantCount-1)){
+                message.setMemorandumState(r.getMemorandumState());
+                message.setMessage(Integer.toString(index+2));
+                template.convertAndSend("/sub/memorandum/next/" + message.getRoomCode(), message);
+            }
+            else{
+                message.setMessage("not agreed");
+                template.convertAndSendToUser(headerAccessor.getSessionId(), "/sub/memorandum/vote/" + message.getRoomCode(), message);
+
+            }
+
+
+        }
+
+    }
 
 
     @MessageMapping("/chat/message")
     public void message(chatFormat message, SimpMessageHeaderAccessor headerAccessor) {
-        Room r=roomList.findRoomByRoomCode(message.getRoomCode());
-        r.addChatMessage(message.getSender(), message.getMessage() );
-        log.info(message.getSender() + ": " +message.getMessage() + " , roomCode: " +message.getRoomCode());
+        Room r = roomList.findRoomByRoomCode(message.getRoomCode());
+        r.addChatMessage(message.getSender(), message.getMessage());
+        log.info(message.getSender() + ": " + message.getMessage() + " , roomCode: " + message.getRoomCode());
         template.convertAndSend("/sub/chat/message/" + message.getRoomCode(), message);
     }
 
-//
-//	@MessageMapping(value = "/chat")
-//	// headerAccessor는 소켓서버의 주인ID를 확인하기 위해서 사용
-//	public void chat(MemorandumMessage message, SimpMessageHeaderAccessor headerAccessor) throws InterruptedException {
-//		log.info(message.getType());
-//		//이 방에서 게임하고있는 플레이어들
-//		List<MemorandumParticipant> gpList = roomParticipantRepository.getMemorandumParticipant(message.getRoomId());
-//
-//		if (message.getType().equals("join")) {
-//			message.setType("join");
-//			template.convertAndSend("/chat" + message.getRoomId(), message);
-//
-//		}
-//
-//
-//		if (message.getType().equals("send")) {
-//			String sessionId = headerAccessor.getSessionAttributes().get("sessionId").toString();
-//
-//			message.setType("send");
-//			template.convertAndSend("/chat" + sessionId, message);
-//
-//		}
-//
-//
-//
-//	}
 
     //소켓 끊김 감지
     @EventListener
     public void onDisconnectEvent(SessionDisconnectEvent event) {
-        String sessionId=event.getSessionId();
-        log.info( "disconnect : " +sessionId);
-        log.info( roomList.deleteParticipant(sessionId));
-
+        String sessionId = event.getSessionId();
+        log.info("disconnect : " + sessionId);
+        log.info(roomList.deleteParticipant(sessionId));
 
     }
-
-
 }
 
 @Getter

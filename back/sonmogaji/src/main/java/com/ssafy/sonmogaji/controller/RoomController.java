@@ -23,7 +23,6 @@ import javax.servlet.http.HttpServletResponse;
 public class RoomController {
 
 
-
     private final RoomService roomService;
 
     @Autowired
@@ -31,15 +30,12 @@ public class RoomController {
 
 
     @PostMapping("/isAvail")
-    public ResponseEntity<?> isAvail (@RequestBody RoomRequestDto memoDto, HttpServletResponse response) throws Exception {
+    public ResponseEntity<?> isAvail(@RequestBody RoomRequestDto memoDto, HttpServletResponse response) throws Exception {
 
         try {
-            RoomResponseDto responseDto= roomService.isAvail(memoDto.getRoomCode());
-            //LoginResponseDto responseDto = memberService.login(loginDto.getMemberAddress());
-//			String token = memberService.login(memberAddress);
-//			response.setHeader("authorization", "bearer " + token);
+            RoomResponseDto responseDto = roomService.isAvail(memoDto.getRoomCode());
 
-                return new ResponseEntity<RoomResponseDto>(responseDto, HttpStatus.OK);
+            return new ResponseEntity<RoomResponseDto>(responseDto, HttpStatus.OK);
 
         } catch (Exception e) {
             return exceptionHandling(e);
@@ -48,16 +44,11 @@ public class RoomController {
     }
 
     @PostMapping("/create")
-    public ResponseEntity<?> create (@RequestBody RoomRequestDto memoDto, HttpServletResponse response) throws Exception {
+    public ResponseEntity<?> create(@RequestBody RoomRequestDto memoDto, HttpServletResponse response) throws Exception {
 
         try {
             RoomResponseDto responseDto = roomService.create(memoDto.getSenderNickName());
 
-
-//            RoomResponseDto responseDto= roomService.isAvail(memoDto.getRoomCode());
-            //LoginResponseDto responseDto = memberService.login(loginDto.getMemberAddress());
-//			String token = memberService.login(memberAddress);
-//			response.setHeader("authorization", "bearer " + token);
 
             return new ResponseEntity<RoomResponseDto>(responseDto, HttpStatus.OK);
         } catch (Exception e) {
@@ -65,37 +56,6 @@ public class RoomController {
         }
 
     }
-
-//    public boolean isAvail(String roomId){
-//        Room r =roomList.findRoomByRoomId(roomId);
-//        if(r==null){
-//            return false;
-//        }
-//        if(!r.isStart()){
-//            return true;
-//        }else{
-//            return false;
-//        }
-//    }
-
-//    @PostMapping("/join")
-//    public ResponseEntity<?> join (@RequestBody RoomRequestDto memoDto, HttpServletResponse response) throws Exception {
-//
-//        try {
-//            Room r= roomList.findRoomByRoomId(memoDto.getRoomId());
-//            if( isAvail(memoDto.getRoomId())){
-//                r.addParticipant(memoDto);
-//            }
-//            //LoginResponseDto responseDto = memberService.login(loginDto.getMemberAddress());
-////			String token = memberService.login(memberAddress);
-////			response.setHeader("authorization", "bearer " + token);
-//
-//            //return new ResponseEntity<RoomResponseDto>(responseDto, HttpStatus.OK);
-//        } catch (Exception e) {
-//            return exceptionHandling(e);
-//        }
-//
-//    }
 
 
     private ResponseEntity<String> exceptionHandling(Exception e) {

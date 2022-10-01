@@ -11,7 +11,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class Participant {
-//    private int roomId;
     private String nickname;
     private String sessionId;
     private String signUrl;

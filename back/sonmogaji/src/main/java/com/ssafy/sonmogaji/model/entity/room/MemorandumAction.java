@@ -15,6 +15,7 @@ public class MemorandumAction {
     private String senderSocketId;
     private String message;
     private String action;
+    private MemorandumState memorandumState;
 //	private String type;
 
 }
