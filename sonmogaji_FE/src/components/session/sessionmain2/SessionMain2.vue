@@ -31,19 +31,25 @@
       ></b-form-textarea>
     </b-row>
     <b-row>
-          <b-col>{{ agreeCount }} / {{ memberCount }} 명이 동의했습니다</b-col> </b-row>
+          <b-col>{{ this.getAgree2 }} / {{ Object.keys(this.getMemorandumState.agree[1]).length - 1 }}  명이 동의했습니다</b-col> </b-row>
         
     <b-row>
       <b-col><b-button @click="toMain3">진행</b-button></b-col>
-      <b-col><b-button> 동의</b-button></b-col>
+      <b-col><b-button @click="vote2"> 동의</b-button></b-col>
     </b-row>
   </b-container>
 </template>
 
 <script>
+import { mapActions, mapGetters, mapState } from "vuex";
 export default {
   name: "SessionMain2",
   components: {},
+  computed:{
+    ...mapState(["memorandumState", "agree2"]),
+    ...mapGetters(["getMemorandumState", "getAgree2"]),
+  }
+  ,
   created() {
     //this.$router.push({name:"main1Slide1"})
     console.log("sessionMain2");
@@ -55,8 +61,12 @@ export default {
     };
   },
   methods: {
+    ...mapActions(["roomVote", "roomVoteCancel", "roomNext"]),
     toMain3() {
-      this.$router.push({ name: "sessionMain3" });
+      this.roomNext(3);
+    },
+     vote2() {
+      this.roomVote(2);
     },
   },
 };

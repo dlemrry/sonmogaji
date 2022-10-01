@@ -56,7 +56,7 @@ export default {
       console.log(this.getRoomCode);
       console.log(this.getSenderNickName);
       axios
-        .post("http://localhost:8080/api/room/isAvail", {
+        .post("/api/room/isAvail", {
           roomCode: this.getRoomCode,
           senderNickName: this.getSenderNickName,
         })
@@ -79,7 +79,7 @@ export default {
     },
     chooseObserver() {
       axios
-        .post("http://localhost:8080/api/room/isAvail", {
+        .post("/api/room/isAvail", {
           roomCode: this.getRoomCode,
           senderNickName: this.getSenderNickName,
         })

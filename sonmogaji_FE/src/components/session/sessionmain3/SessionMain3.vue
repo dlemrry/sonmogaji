@@ -51,17 +51,18 @@
       >
     </b-row>
     <b-row>
-      <b-col>{{ agreeCount }} / {{ memberCount }} 명이 동의했습니다</b-col>
+      <b-col>{{ this.getAgree3  }} / {{ Object.keys(this.getMemorandumState.agree[2]).length - 1  }} 명이 동의했습니다</b-col>
     </b-row>
 
     <b-row>
       <b-col><b-button @click="toMain4">진행</b-button></b-col>
-      <b-col><b-button >동의</b-button></b-col>
+      <b-col><b-button @click="vote3">동의</b-button></b-col>
     </b-row>
   </b-container>
 </template>
 
 <script>
+import { mapActions, mapGetters, mapState } from "vuex";
 export default {
   name: "SessionMain3",
   components: {},
@@ -70,21 +71,25 @@ export default {
     console.log("sessionMain3");
   },
   computed: {
+    ...mapState(["memorandumState", "agree3"]),
+    ...mapGetters(["getMemorandumState", "getAgree3"]),
     disabled() {
       return this.status === "disabled";
     },
   },
   data() {
     return {
-      agreeCount: 0,
-      memberCount: 4,
       selected: "",
       status: "",
     };
   },
   methods: {
+    ...mapActions(["roomVote", "roomVoteCancel", "roomNext"]),
     toMain4() {
-      this.$router.push({ name: "sessionMain4" });
+      this.roomNext(4);
+    },
+    vote3() {
+      this.roomVote(3);
     },
   },
 };

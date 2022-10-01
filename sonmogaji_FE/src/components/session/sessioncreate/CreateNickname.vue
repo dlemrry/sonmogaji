@@ -38,7 +38,7 @@ export default {
       if (this.nicknameinput != "") {
         this.enterNickName(this.nicknameinput);
         axios
-          .post("http://localhost:8080/api/room/create", {
+          .post("/api/room/create", {
             senderNickName: this.getSenderNickName,
           })
           .then( (response)=> {
