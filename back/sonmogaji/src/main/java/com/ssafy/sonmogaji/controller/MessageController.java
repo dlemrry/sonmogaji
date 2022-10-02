@@ -155,6 +155,74 @@ public class MessageController {
 
     }
 
+    @MessageMapping(value = "/memorandum/content")
+    // headerAccessor는 소켓서버의 주인ID를 확인하기 위해서 사용
+    public void content(MemorandumAction message, SimpMessageHeaderAccessor headerAccessor) throws InterruptedException {
+
+        Room r = roomList.findRoomByRoomCode(message.getRoomCode());
+        if (r.startRoom(headerAccessor.getSessionId())) {
+            r.getMemorandumState().setTitle(message.getTitle());
+            r.getMemorandumState().setContent(message.getContent());
+
+            message.setMessage("ok");
+            message.setMemorandumState(r.getMemorandumState());
+            template.convertAndSend("/sub/memorandum/content/" + message.getRoomCode(), message);
+        } else {
+            message.setMessage("you are not host");
+            template.convertAndSendToUser(headerAccessor.getSessionId(), "/sub/memorandum/start/" + message.getRoomCode(), message);
+        }
+    }
+    @MessageMapping(value = "/memorandum/secret")
+    // headerAccessor는 소켓서버의 주인ID를 확인하기 위해서 사용
+    public void secret(MemorandumAction message, SimpMessageHeaderAccessor headerAccessor) throws InterruptedException {
+
+        Room r = roomList.findRoomByRoomCode(message.getRoomCode());
+        if (r.startRoom(headerAccessor.getSessionId())) {
+            r.getMemorandumState().setSecret(message.isSecret());
+
+            message.setMessage("ok");
+            message.setMemorandumState(r.getMemorandumState());
+            template.convertAndSend("/sub/memorandum/secret/" + message.getRoomCode(), message);
+        } else {
+            message.setMessage("you are not host");
+            template.convertAndSendToUser(headerAccessor.getSessionId(), "/sub/memorandum/secret/" + message.getRoomCode(), message);
+        }
+    }
+    @MessageMapping(value = "/memorandum/memorysecret")
+    // headerAccessor는 소켓서버의 주인ID를 확인하기 위해서 사용
+    public void memorysecret(MemorandumAction message, SimpMessageHeaderAccessor headerAccessor) throws InterruptedException {
+
+        Room r = roomList.findRoomByRoomCode(message.getRoomCode());
+        if (r.startRoom(headerAccessor.getSessionId())) {
+            r.getMemorandumState().setMemorySecret((message.isMemorySecret()));
+
+
+            message.setMessage("ok");
+            message.setMemorandumState(r.getMemorandumState());
+            template.convertAndSend("/sub/memorandum/memorysecret/" + message.getRoomCode(), message);
+        } else {
+            message.setMessage("you are not host");
+            template.convertAndSendToUser(headerAccessor.getSessionId(), "/sub/memorandum/memorysecret/" + message.getRoomCode(), message);
+        }
+    }
+    @MessageMapping(value = "/memorandum/expire")
+    // headerAccessor는 소켓서버의 주인ID를 확인하기 위해서 사용
+    public void expire(MemorandumAction message, SimpMessageHeaderAccessor headerAccessor) throws InterruptedException {
+
+        Room r = roomList.findRoomByRoomCode(message.getRoomCode());
+        if (r.startRoom(headerAccessor.getSessionId())) {
+
+            r.getMemorandumState().setExpire(message.getExpire());
+
+            message.setMessage("ok");
+            message.setMemorandumState(r.getMemorandumState());
+            template.convertAndSend("/sub/memorandum/expire/" + message.getRoomCode(), message);
+        } else {
+            message.setMessage("you are not host");
+            template.convertAndSendToUser(headerAccessor.getSessionId(), "/sub/memorandum/expire/" + message.getRoomCode(), message);
+        }
+    }
+
 
     @MessageMapping("/chat/message")
     public void message(chatFormat message, SimpMessageHeaderAccessor headerAccessor) {
