@@ -15,43 +15,69 @@
       <b-col cols="1"><b-row class="circledot" /><b-row>최종 확인</b-row></b-col>
     </b-row>
     <b-row>각서 공개 여부</b-row>
-    <b-row>
+    <b-row v-if="this.getIsHost">
       <b-col
-        ><b-form-radio
-          v-model="selected"
-          name="some-radios"
-          value="A"
+        ><b-form-radio v-model="selected" name="some-radios" value="A" @change="secretchange"
           >공개</b-form-radio
         ></b-col
       >
       <b-col
-        ><b-form-radio
-          v-model="selected"
-          name="some-radios"
-          value="B"
+        ><b-form-radio v-model="selected" name="some-radios" value="B" @change="secretchange"
+          >비공개</b-form-radio
+        ></b-col
+      >
+    </b-row>
+    <b-row v-else>
+      <b-col
+        ><b-form-radio v-model="selected" name="some-radios" value="A" onclick="return(false);" @change="secretchange"
+          >공개</b-form-radio
+        ></b-col
+      >
+      <b-col
+        ><b-form-radio v-model="selected" name="some-radios" value="B" onclick="return(false);" @change="secretchange"
           >비공개</b-form-radio
         ></b-col
       >
     </b-row>
     <b-row>각서 만료 날짜</b-row>
-    <b-row>
+    <b-row v-if="this.getIsHost">
       <b-col
-        ><b-form-datepicker id="ex-disabled-readonly" :disabled="disabled"></b-form-datepicker>
+        ><b-form-datepicker v-model="expire" id="ex-disabled-readonly"   @input="datechange"></b-form-datepicker>
       </b-col>
-      <b-col
+      <!-- <b-col
         ><b-form-checkbox
           id="checkbox-1"
-          v-model="status"
+          v-model="this.getExpire"
           name="checkbox-1"
           value="disabled"
           unchecked-value=""
         >
           무기한
         </b-form-checkbox></b-col
-      >
+      > -->
+    </b-row>
+    <b-row v-else>
+      <b-col
+        ><b-form-datepicker v-model="expire" id="ex-disabled-readonly"  readonly  ></b-form-datepicker>
+      </b-col>
+      <!-- <b-col
+        ><b-form-checkbox
+          id="checkbox-1"
+          v-model="this.getExpire"
+          name="checkbox-1"
+          value="disabled"
+          unchecked-value=""
+           onclick="return(false);"
+        >
+          무기한
+        </b-form-checkbox></b-col
+      > -->
     </b-row>
     <b-row>
-      <b-col>{{ this.getAgree3  }} / {{ Object.keys(this.getMemorandumState.agree[2]).length - 1  }} 명이 동의했습니다</b-col>
+      <b-col
+        >{{ this.getAgree3 }} / {{ Object.keys(this.getMemorandumState.agree[2]).length - 1 }} 명이
+        동의했습니다</b-col
+      >
     </b-row>
 
     <b-row>
@@ -62,7 +88,7 @@
 </template>
 
 <script>
-import { mapActions, mapGetters, mapState } from "vuex";
+import { mapActions, mapGetters, mapMutations, mapState } from "vuex";
 export default {
   name: "SessionMain3",
   components: {},
@@ -71,26 +97,58 @@ export default {
     console.log("sessionMain3");
   },
   computed: {
-    ...mapState(["memorandumState", "agree3"]),
-    ...mapGetters(["getMemorandumState", "getAgree3"]),
+    ...mapState(["memorandumState", "agree3", "secret","isHost","expire"]),
+    ...mapGetters(["getMemorandumState", "getAgree3", "getSecret","getIsHost","getExpire"]),
     disabled() {
-      return this.status === "disabled";
+      return this.getExpire === "disabled";
     },
+    selected: {
+      get() {
+        // return this.$store.state.title;
+        return this.getSecret;
+      },
+      set(value) {
+        this.setSecret(value);
+
+        //this.$store.commit("updateMessage", value);
+      },
+    },
+    expire:{
+      get() {
+        // return this.$store.state.title;
+        return this.getExpire;
+      },
+      set(value) {
+        this.setExpire(value);
+
+        //this.$store.commit("updateMessage", value);
+      },
+    }
   },
+  updated() {},
   data() {
     return {
-      selected: "",
-      status: "",
+
+      //status: "",
     };
   },
   methods: {
-    ...mapActions(["roomVote", "roomVoteCancel", "roomNext"]),
+    ...mapActions(["roomVote", "roomVoteCancel", "roomNext", "sendSecret","sendDate"]),
+    ...mapMutations(["setSecret","setExpire"]),
     toMain4() {
       this.roomNext(4);
     },
     vote3() {
       this.roomVote(3);
     },
+    secretchange() {
+      console.log(this.selected);
+      this.sendSecret()
+    },
+    datechange(){
+      console.log(this.getExpire)
+      this.sendDate()
+    }
   },
 };
 </script>

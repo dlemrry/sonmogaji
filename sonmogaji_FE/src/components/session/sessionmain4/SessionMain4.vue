@@ -26,12 +26,13 @@
       ></b-col>
     </b-row>
     <b-row>사진 공개 여부</b-row>
-    <b-row>
+    <b-row v-if="this.getIsHost">
       <b-col
         ><b-form-radio
           v-model="selected"
           name="some-radios"
           value="A"
+          @change="memorysecretchange"
           >공개</b-form-radio
         ></b-col
       >
@@ -40,6 +41,29 @@
           v-model="selected"
           name="some-radios"
           value="B"
+          @change="memorysecretchange"
+          >비공개</b-form-radio
+        ></b-col
+      >
+    </b-row>
+    <b-row v-else>
+      <b-col
+        ><b-form-radio
+          v-model="selected"
+          name="some-radios"
+          value="A"
+          @change="memorysecretchange"
+          onclick="return(false);"
+          >공개</b-form-radio
+        ></b-col
+      >
+      <b-col
+        ><b-form-radio
+          v-model="selected"
+          name="some-radios"
+          value="B"
+          @change="memorysecretchange"
+          onclick="return(false);"
           >비공개</b-form-radio
         ></b-col
       >
@@ -57,7 +81,7 @@
 
 <script>
 
-import { mapActions, mapGetters, mapState } from "vuex";
+import { mapActions, mapGetters, mapMutations, mapState } from "vuex";
 export default {
   name: "SessionMain4",
   components: {},
@@ -67,24 +91,37 @@ export default {
   },
   computed: {
     ...mapState(["memorandumState", "agree4"]),
-    ...mapGetters(["getMemorandumState", "getAgree4"]),
-    disabled() {
-      return this.status === "disabled";
+    ...mapGetters(["getMemorandumState", "getAgree4","getMemorySecret","getIsHost"]),
+   
+    selected: {
+      get() {
+        // return this.$store.state.title;
+        return this.getMemorySecret;
+      },
+      set(value) {
+        this.setMemorySecret(value);
+
+        //this.$store.commit("updateMessage", value);
+      },
     },
   },
   data() {
     return {
-      selected: "",
       status: "",
     };
   },
   methods: {
-    ...mapActions(["roomVote", "roomVoteCancel", "roomNext"]),
+    ...mapActions(["roomVote", "roomVoteCancel", "roomNext","sendMemorySecret"]),
+    ...mapMutations(["setMemorySecret"]),
     toMain5() {
       this.roomNext(5);
     },
      vote4() {
       this.roomVote(4);
+    },
+    memorysecretchange() {
+      console.log(this.selected);
+      this.sendMemorySecret()
     },
   },
 };

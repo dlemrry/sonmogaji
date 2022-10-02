@@ -34,7 +34,7 @@
 </template>
 
 <script>
-import { mapState, mapActions, mapGetters } from "vuex";
+import { mapState, mapActions, mapGetters, mapMutations } from "vuex";
 import axios from "axios";
 export default {
   name: "ChooseRoll",
@@ -52,6 +52,7 @@ export default {
   },
   methods: {
     ...mapActions(["enterRoll", "enterRoomCode"]),
+    ...mapMutations(["setIsHost"]),
     chooseSignee() {
       console.log(this.getRoomCode);
       console.log(this.getSenderNickName);
@@ -86,6 +87,7 @@ export default {
         .then((response) => {
           console.log(response.data);
           this.enterRoll("observer");
+          this.setIsHost(false);
 
           this.$router.push({ name: "session" });
         })

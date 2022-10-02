@@ -13,7 +13,7 @@
 </template>
 
 <script>
-import { mapState, mapActions, mapGetters } from "vuex";
+import { mapState, mapActions, mapGetters, mapMutations } from "vuex";
 import axios from "axios";
 export default {
   name: "cnterNickname",
@@ -34,6 +34,7 @@ export default {
   },
   methods: {
     ...mapActions(["enterNickName","enterRoomCode","enterRoll"]),
+    ...mapMutations(["setIsHost"]),
     create() {
       if (this.nicknameinput != "") {
         this.enterNickName(this.nicknameinput);
@@ -45,7 +46,7 @@ export default {
             this.enterRoll("signee");
             console.log(response.data.roomCode);
             this.enterRoomCode(response.data.roomCode);
-            
+            this.setIsHost(true);
             this.$router.push({ name: "session" });
           })
           .catch( (error) =>{
