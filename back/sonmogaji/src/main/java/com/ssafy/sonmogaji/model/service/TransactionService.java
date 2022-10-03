@@ -27,6 +27,9 @@ public interface TransactionService {
 	
 	// 각서 작성
 	public void writeTransaction(TransactionDto transactionDto, MultipartFile file);
+
+	//각서 이미지 저장
+	public String uploadFile(MultipartFile file);
 	
 	
 

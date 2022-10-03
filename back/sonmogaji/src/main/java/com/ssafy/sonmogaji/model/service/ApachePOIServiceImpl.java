@@ -3,22 +3,30 @@ package com.ssafy.sonmogaji.model.service;
 import com.spire.doc.Document;
 import com.spire.doc.documents.ImageType;
 import com.ssafy.sonmogaji.model.dto.TransactionDto;
+import com.ssafy.sonmogaji.util.Base64ToImgDecoder;
+import com.ssafy.sonmogaji.util.Steganographer;
+import lombok.RequiredArgsConstructor;
+import org.apache.poi.util.Units;
 import org.apache.poi.xwpf.usermodel.*;
-import org.aspectj.apache.bcel.util.ClassPath;
 import org.springframework.stereotype.Service;
 
 import javax.imageio.ImageIO;
+import javax.xml.bind.DatatypeConverter;
 import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
+import java.io.*;
 import java.util.Iterator;
 import java.util.List;
 
 @Service
+@RequiredArgsConstructor
 public class ApachePOIServiceImpl implements ApachePOIService{
 
 //    private static final String PATH = "classpath:/static/";
+
+    private final Base64ToImgDecoder base64ToImgDecoder;
+    private final Steganographer steganographer;
+
+
 
     @Override
     public void createPreview(TransactionDto transactionDto) throws Exception {
@@ -30,6 +38,7 @@ public class ApachePOIServiceImpl implements ApachePOIService{
 
             XWPFDocument doc = new XWPFDocument(new FileInputStream(file));
 
+            // 본문 입력하기
             for(XWPFParagraph p : doc.getParagraphs()) {
                 List<XWPFRun> runs = p.getRuns();
                 if(runs != null) {
@@ -51,7 +60,6 @@ public class ApachePOIServiceImpl implements ApachePOIService{
                 }
             }
 
-
             XWPFTable table = null;
             // 테이블 요소 구하기
             Iterator<IBodyElement> docElementsIterator = doc.getBodyElementsIterator();
@@ -65,23 +73,35 @@ public class ApachePOIServiceImpl implements ApachePOIService{
                 }
             }
 
-            String txTitle = transactionDto.getTxTitle();
-            String txContent = transactionDto.getTxContent();
-
-
-//            XWPFParagraph paragraph = doc.createParagraph();
+            for(int i = 0; i<transactionDto.getSignees().size() -2 ; i++) {
+                table.createRow();
+            }
 
             for(int i = 0; i < transactionDto.getSignees().size(); i++ ) {
                 XWPFTableRow row = table.getRow(i);
-                row.getCell(0).setText(transactionDto.getSignees().get(i));
-                table.createRow();
-//                row.getCell(1).setParagraph(paragraph.createRun().addPicture());
+                row.getCell(0).setText(transactionDto.getSignees().get(i).getMemberAddress());
+
+                // 사인 이미지 넣기
+                String data = transactionDto.getSignees().get(i).getSignBase64().split(",")[1];
+                byte[] imgBytes = DatatypeConverter.parseBase64Binary(data);
+                BufferedImage bufImg = ImageIO.read(new ByteArrayInputStream(imgBytes));
+
+                InputStream is = new ByteArrayInputStream(imgBytes);
+
+
+
+                int imgType = XWPFDocument.PICTURE_TYPE_PNG;
+                String imgFileName = transactionDto.getSignees().get(i).getSigneeName();
+                int width = 200;
+                int height = 100;
+
+                XWPFParagraph paragraph = doc.createParagraph();
+                XWPFRun run = paragraph.createRun();
+                run.addPicture(is, imgType, imgFileName,Units.toEMU(width), Units.toEMU(height));
+
+                row.getCell(1).setParagraph(paragraph);
 
             }
-
-
-//            row.getCell(1).setParagraph(paragraph.createRun().addPicture());
-
 
             fos = new FileOutputStream(new File(sample));
             doc.write(fos);
@@ -92,6 +112,7 @@ public class ApachePOIServiceImpl implements ApachePOIService{
             e.printStackTrace();
         }
 
+        // 각서 이미지로 변환하기
         File file = new File(sample);
 
         Document document = new Document();
@@ -104,7 +125,10 @@ public class ApachePOIServiceImpl implements ApachePOIService{
     }
 
     @Override
-    public File createImg(File preview) {
+    public File createImg(File preview, String transactionAddress) {
+
+        steganographer.encode(preview, transactionAddress);
+
         return null;
     }
 }

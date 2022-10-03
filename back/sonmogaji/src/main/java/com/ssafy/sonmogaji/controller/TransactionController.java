@@ -71,7 +71,7 @@ public class TransactionController {
             throws Exception {
 
         try {
-
+            transactionService.uploadFile(file);
             transactionService.writeTransaction(transactionDto, file);
 
             return new ResponseEntity<String>("tx is created successfully", HttpStatus.OK);

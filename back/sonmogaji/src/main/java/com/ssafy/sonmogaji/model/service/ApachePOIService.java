@@ -9,7 +9,7 @@ public interface ApachePOIService {
     public void createPreview(TransactionDto transactionDto) throws Exception;
 
     // 각서 이미지 만들기
-    public File createImg(File preview);
+    public File createImg(File preview, String transactionAddress);
 
 
 }
