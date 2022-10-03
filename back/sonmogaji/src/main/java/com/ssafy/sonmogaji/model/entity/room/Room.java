@@ -75,6 +75,16 @@ public class Room {
         this.Participants.add(Participant);
     }
 
+    public String findParticipantBySessionId(String sessionId){
+
+        for (int i = 0; i < this.getParticipants().size(); i++) {
+            if(this.getParticipants().get(i).getSessionId().equals(sessionId)){
+                return this.getParticipants().get(i).getNickname();
+            }
+        }
+        return null;
+    }
+
 
     public void addChatMessage(String sender, String message) {
 

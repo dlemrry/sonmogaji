@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.time.LocalDate;
 import java.util.Date;
 import java.util.Map;
 
@@ -20,7 +21,7 @@ public class MemorandumAction {
     private String title;
     private String content;
     private String action;
-    private Date expire;
+    private LocalDate expire;
     private boolean secret;
     private boolean memorySecret;
     private String memoryImage;

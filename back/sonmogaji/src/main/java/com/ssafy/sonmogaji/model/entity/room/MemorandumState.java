@@ -4,6 +4,7 @@ package com.ssafy.sonmogaji.model.entity.room;
 import jnr.a64asm.Mem;
 import lombok.*;
 
+import java.time.LocalDate;
 import java.util.*;
 
 @Getter
@@ -14,7 +15,7 @@ public class MemorandumState {
     private String title;
     private String content;
     private boolean secret;
-    private Date expire;
+    private LocalDate expire;
     private String memoryImage;
     private boolean memorySecret;
     private HashMap<String,String> sign;
@@ -36,7 +37,7 @@ public class MemorandumState {
         this.title = "";
         this.content = "";
         this.secret = false;
-        this.expire = new Date();
+        this.expire = LocalDate.now();
         this.memoryImage = "";
         this.memorySecret = false;
         this.sign = new HashMap<String,String>();

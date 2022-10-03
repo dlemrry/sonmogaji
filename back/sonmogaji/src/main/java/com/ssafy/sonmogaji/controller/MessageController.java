@@ -1,6 +1,11 @@
 package com.ssafy.sonmogaji.controller;
 
+import com.ssafy.sonmogaji.model.dto.SigneeDto;
+import com.ssafy.sonmogaji.model.dto.TransactionDto;
 import com.ssafy.sonmogaji.model.entity.room.*;
+import com.ssafy.sonmogaji.model.service.ApachePOIServiceImpl;
+import com.ssafy.sonmogaji.model.service.Base64ToFile;
+import com.ssafy.sonmogaji.model.service.TransactionServiceImpl;
 import lombok.*;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,11 +15,15 @@ import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.socket.messaging.SessionDisconnectEvent;
 import org.web3j.abi.datatypes.Bool;
 import org.web3j.crypto.Hash;
 
+import java.awt.image.BufferedImage;
+import java.time.LocalDate;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -30,6 +39,12 @@ public class MessageController {
     private final SimpMessagingTemplate template;
     @Autowired
     private RoomList roomList;
+
+    @Autowired
+    private TransactionServiceImpl transactionService;
+
+    @Autowired
+    private ApachePOIServiceImpl apachePOIService;
 
 
     @MessageMapping(value = "/memorandum/join")
@@ -125,7 +140,7 @@ public class MessageController {
         Room r = roomList.findRoomByRoomCode(message.getRoomCode());
         if (!r.getHostSessionId().equals(headerAccessor.getSessionId())) {
             message.setMessage("you are not host");
-            template.convertAndSendToUser(headerAccessor.getSessionId(), "/sub/memorandum/vote/" + message.getRoomCode(), message);
+            template.convertAndSendToUser(headerAccessor.getSessionId(), "/sub/memorandum/next/" + message.getRoomCode(), message);
 
         } else {
 //            HashMap<String, Boolean> agree = r.getMemorandumState().getAgree().get(Integer.parseInt(message.getMessage()));
@@ -139,7 +154,7 @@ public class MessageController {
                 for( Map.Entry<String, Boolean> elem : sstate.entrySet() ){
                     if(!elem.getValue()){
                         message.setMessage("sign not done");
-                        template.convertAndSendToUser(headerAccessor.getSessionId(), "/sub/memorandum/vote/" + message.getRoomCode(), message);
+                        template.convertAndSendToUser(headerAccessor.getSessionId(), "/sub/memorandum/next/" + message.getRoomCode(), message);
                         flag=false;
                         break;
                     }
@@ -168,7 +183,7 @@ public class MessageController {
                 }
                 else{
                     message.setMessage("not agreed");
-                    template.convertAndSendToUser(headerAccessor.getSessionId(), "/sub/memorandum/vote/" + message.getRoomCode(), message);
+                    template.convertAndSendToUser(headerAccessor.getSessionId(), "/sub/memorandum/next/" + message.getRoomCode(), message);
 
                 }
             }
@@ -193,7 +208,7 @@ public class MessageController {
             template.convertAndSend("/sub/memorandum/content/" + message.getRoomCode(), message);
         } else {
             message.setMessage("you are not host");
-            template.convertAndSendToUser(headerAccessor.getSessionId(), "/sub/memorandum/start/" + message.getRoomCode(), message);
+            template.convertAndSendToUser(headerAccessor.getSessionId(), "/sub/memorandum/content/" + message.getRoomCode(), message);
         }
     }
     @MessageMapping(value = "/memorandum/secret")
@@ -277,6 +292,73 @@ public class MessageController {
 
     }
 
+    @MessageMapping(value = "/memorandum/preview")
+    // headerAccessor는 소켓서버의 주인ID를 확인하기 위해서 사용
+    public void preview(previewFormat message, SimpMessageHeaderAccessor headerAccessor) throws Exception {
+
+        Room r = roomList.findRoomByRoomCode(message.getRoomCode());
+        MemorandumState mstate=r.getMemorandumState();
+        if (r.startRoom(headerAccessor.getSessionId())) {
+            // 추억이미지 s3 업로드
+            final String[] base64Array = r.getMemorandumState().getMemoryImage().split(",");
+            String dataUir, data;
+            if (base64Array.length > 1) {
+                dataUir = base64Array[0];
+                data = base64Array[1];
+            } else {
+                //Build according to the specific file you represent
+                dataUir = "data:image/jpg;base64";
+                data = base64Array[0];
+            }
+
+            MultipartFile multipartFile = new Base64ToFile(data, dataUir);
+            String memoryfileUrl=transactionService.uploadFile(multipartFile);
+
+
+            // 추억이미지 s3 업로드 끝
+
+            //각서 이미지 생성
+                //dto 생성
+            TransactionDto tdto=new TransactionDto();
+            Map<String,String> signmap = r.getMemorandumState().getSign();
+
+            List<SigneeDto> sList = new LinkedList<>();
+            for( Map.Entry<String, String> elem : signmap.entrySet() ){
+                SigneeDto sDto = new SigneeDto();
+                String name = r.findParticipantBySessionId(elem.getKey());
+
+                sDto.setSigneeName(name);
+                sDto.setSignBase64(elem.getValue());
+
+            }
+
+
+            tdto.setTxTitle(mstate.getTitle());
+            tdto.setTxContent(mstate.getContent());
+            tdto.setTxCreateDate(LocalDate.now());
+            tdto.setTxExpDate(mstate.getExpire());
+            tdto.setTxIsSecret(mstate.isSecret());
+            tdto.setImageIsSecret(mstate.isMemorySecret());
+            tdto.setSignees(sList);
+            tdto.setImageUrl(memoryfileUrl);
+                //dto 생성 끝
+
+
+            BufferedImage bimage= apachePOIService.createPreview(tdto);
+            //각서 이미지 생성끝
+
+            //각서 이미지 base64로 다시 변환
+            String b64img=Base64ToFile.encodeToString(bimage,"png");
+            message.setMessage("ok");
+            message.setPreview(b64img);
+
+            template.convertAndSend("/sub/memorandum/preview/" + message.getRoomCode(), message);
+        } else {
+            message.setMessage("you are not host");
+            template.convertAndSendToUser(headerAccessor.getSessionId(), "/sub/memorandum/preview/" + message.getRoomCode(), message);
+        }
+    }
+
     @MessageMapping("/chat/message")
     public void message(chatFormat message, SimpMessageHeaderAccessor headerAccessor) {
         Room r = roomList.findRoomByRoomCode(message.getRoomCode());
@@ -334,6 +416,17 @@ class signFormat {
 @NoArgsConstructor
 class joinFormat {
     private String message;
+    private String senderNickName;
+    private String roomCode;
+}
+
+@Getter
+@Setter
+@AllArgsConstructor
+@NoArgsConstructor
+class  previewFormat {
+    private String message;
+    private String preview;
     private String senderNickName;
     private String roomCode;
 }

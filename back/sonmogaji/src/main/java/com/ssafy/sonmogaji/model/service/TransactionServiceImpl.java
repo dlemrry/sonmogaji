@@ -1,10 +1,8 @@
 package com.ssafy.sonmogaji.model.service;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.List;
 import java.util.UUID;
 
@@ -123,12 +121,13 @@ public class TransactionServiceImpl implements TransactionService {
 		return null;
 	}
 
-	// 각서 이미지 저장
+	// 추억 이미지 저장
 	public String uploadFile(MultipartFile file) {
 		String fileName = createFileName(file.getOriginalFilename());
 		ObjectMetadata objectMetadata = new ObjectMetadata();
 		objectMetadata.setContentLength(file.getSize());
 		objectMetadata.setContentType(file.getContentType());
+
 
 		try(InputStream inputStream = file.getInputStream()) {
 			amazonS3.putObject(new PutObjectRequest(bucket, fileName, inputStream, objectMetadata).withCannedAcl(CannedAccessControlList.PublicRead));
@@ -136,7 +135,8 @@ public class TransactionServiceImpl implements TransactionService {
 			throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "파일 업로드에 실패했습니다.");
 		}
 
-		return fileName;
+//		return fileName;
+		return amazonS3.getUrl(bucket, fileName).toString();
 	}
 
 	private String createFileName(String fileName) {

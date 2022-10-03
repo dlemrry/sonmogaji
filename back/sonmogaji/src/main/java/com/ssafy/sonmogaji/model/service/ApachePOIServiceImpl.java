@@ -29,7 +29,7 @@ public class ApachePOIServiceImpl implements ApachePOIService{
 
 
     @Override
-    public void createPreview(TransactionDto transactionDto) throws Exception {
+    public BufferedImage createPreview(TransactionDto transactionDto) throws Exception {
         String sample = "memorandom.docx";
         FileOutputStream fos = null;
 
@@ -120,8 +120,10 @@ public class ApachePOIServiceImpl implements ApachePOIService{
 
         BufferedImage image = document.saveToImages(0, ImageType.Bitmap);
 
-        File imgFile = new File("Preview.PNG");
-        ImageIO.write(image, "PNG", imgFile);
+        return image;
+
+//        File imgFile = new File("Preview.PNG");
+//        ImageIO.write(image, "PNG", imgFile);
     }
 
     @Override

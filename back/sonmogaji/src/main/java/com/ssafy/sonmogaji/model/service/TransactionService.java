@@ -30,7 +30,7 @@ public interface TransactionService {
 
 	//각서 이미지 저장
 	public String uploadFile(MultipartFile file);
-	
-	
+
+
 
 }
