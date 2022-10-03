@@ -11,10 +11,12 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class Participant {
-//    private int roomId;
     private String nickname;
     private String sessionId;
     private String signUrl;
-    private boolean isHost;
 
+    public Participant(String nickname, String sessionId){
+        this.nickname=nickname;
+        this.sessionId=sessionId;
+    }
 }

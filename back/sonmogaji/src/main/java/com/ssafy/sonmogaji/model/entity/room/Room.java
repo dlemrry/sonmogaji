@@ -1,90 +1,96 @@
 package com.ssafy.sonmogaji.model.entity.room;
 
 import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.extern.log4j.Log4j2;
-import org.springframework.context.annotation.Bean;
-import org.springframework.stereotype.Component;
-import org.springframework.stereotype.Repository;
 
 import javax.annotation.PostConstruct;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Random;
 
 @Log4j2
 @Getter
 @Setter
+@RequiredArgsConstructor
 public class Room {
 
-    private String roomId;
+    private String hostSessionId; //방장 sessionId 와 동일
+    private String roomCode;
     private List<ChatMessage> chatLog;
     private List<Participant> Participants;
+    private boolean isStart;
 
-    public Room(String roomId) {
-        this.roomId = roomId;
-        this.chatLog=new LinkedList<>();
+    private MemorandumState memorandumState;
+
+    public Room(String nickname) {
+        this.hostSessionId = "";
+        this.chatLog = new LinkedList<>();
+        this.isStart = false;
+        this.Participants = new LinkedList<>();
+        this.roomCode = "";
+        this.memorandumState=new MemorandumState();
+
+        Random rd = new Random();
+        for (int i = 0; i < 6; i++) {
+            this.roomCode += rd.nextInt(9);
+        }
+        log.info("room created : " + this.roomCode);
+        //roomcode 랜덤 6자리
+
     }
 
-//	public Room(String roomId){
-//		this.roomId=roomId;
-//		this.Participants = new ArrayList<>();
-//		this.chatLog = new ArrayList<>();
-//	}
+    public Room(String nickname, String hostSessionId) {
+        this.hostSessionId = hostSessionId;
+        this.chatLog = new LinkedList<>();
+        this.isStart = false;
+        this.Participants = new LinkedList<>();
+        this.roomCode = "";
+        Random rd = new Random();
+        for (int i = 0; i < 6; i++) {
+            this.roomCode += rd.nextInt(9);
+        }
+        log.info("room created : " + this.roomCode);
+
+    }
+
 
     @PostConstruct
-    private void init(){
+    private void init() {
         Participants = new ArrayList<>();
         chatLog = new ArrayList<>();
-
-        roomId="";
+        isStart = false;
+        hostSessionId = "";
+        memorandumState=new MemorandumState();
     }
 
-    public void addParticipant(MemorandumAction message, String sessionId) {
+    public void addParticipant(String nickname, String sessionId) {
         Participant Participant = new Participant();
         Participant.setSessionId(sessionId);
-        Participant.setNickname(message.getSenderNickName());
-        //방장이면
-        if(roomId.equals(sessionId)){
-            Participant.setHost(true);
-        }
-        else{
-            Participant.setHost(false);
-        }
+        Participant.setNickname(nickname);
 
-
-        Participants.add(Participant);
+        this.Participants.add(Participant);
     }
 
 
+    public void addChatMessage(String sender, String message) {
 
-    public boolean deleteParticipant(int roomId, String sessionId) {
-//    	List<Participant> gp = getParticipants(roomId);
-
-        boolean flag = false;
-
-        for(int i = 0; i< Participants.size(); i++) {
-            //나간애면
-            if(Participants.get(i).getSessionId().equals(sessionId)) {
-
-                Participants.remove(Participants.get(i));
-            }
-        }
-
-        return flag;
-    }
-
-    public void addChatMessage(String sender, String message){
-
-        chatLog.add(new ChatMessage(sender,message));
+        chatLog.add(new ChatMessage(sender, message));
 
     }
 
 
+    public boolean startRoom(String senderSessionId) {
+        if(this.getHostSessionId().equals(senderSessionId)){
+            this.isStart = true;
+            return true;
+        }
 
-
-
-
+        return false;
+    }
 
 
 }
