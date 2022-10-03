@@ -31,6 +31,7 @@
 
 <script>
 import { mapState, mapActions, mapGetters } from "vuex";
+import axios from "axios"
 export default {
   name: "SessionLobby",
   components: {},
@@ -45,10 +46,12 @@ export default {
     return {};
   },
   methods: {
-    ...mapActions(["memorandumStart"]),
+    ...mapActions(["memorandumStart","roomStart"]),
     start() {
       console.log("시작");
-      this.$router.push({ name: "sessionMain1" });
+      this.roomStart()
+      
+      // this.$router.push({ name: "sessionMain1" });
     },
   },
 };

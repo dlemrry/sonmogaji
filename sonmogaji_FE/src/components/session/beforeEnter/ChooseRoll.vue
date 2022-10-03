@@ -34,7 +34,7 @@
 </template>
 
 <script>
-import { mapState, mapActions, mapGetters } from "vuex";
+import { mapState, mapActions, mapGetters, mapMutations } from "vuex";
 import axios from "axios";
 export default {
   name: "ChooseRoll",
@@ -52,11 +52,12 @@ export default {
   },
   methods: {
     ...mapActions(["enterRoll", "enterRoomCode"]),
+    ...mapMutations(["setIsHost"]),
     chooseSignee() {
       console.log(this.getRoomCode);
       console.log(this.getSenderNickName);
       axios
-        .post("https://j7a308.p.ssafy.io/api/room/isAvail", {
+        .post("/api/room/isAvail", {
           roomCode: this.getRoomCode,
           senderNickName: this.getSenderNickName,
         })
@@ -79,13 +80,14 @@ export default {
     },
     chooseObserver() {
       axios
-        .post("https://j7a308.p.ssafy.io/api/room/isAvail", {
+        .post("/api/room/isAvail", {
           roomCode: this.getRoomCode,
           senderNickName: this.getSenderNickName,
         })
         .then((response) => {
           console.log(response.data);
           this.enterRoll("observer");
+          this.setIsHost(false);
 
           this.$router.push({ name: "session" });
         })

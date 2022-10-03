@@ -13,7 +13,7 @@
 </template>
 
 <script>
-import { mapState, mapActions, mapGetters } from "vuex";
+import { mapState, mapActions, mapGetters, mapMutations } from "vuex";
 import axios from "axios";
 export default {
   name: "cnterNickname",
@@ -22,7 +22,9 @@ export default {
     ...mapState(["senderNickName"]),
     ...mapGetters(["getSenderNickName"]),
   },
-  created() {},
+  created() {
+    this.clearState()
+  },
   mounted() {
     console.log("cnterNickname");
   },
@@ -34,18 +36,19 @@ export default {
   },
   methods: {
     ...mapActions(["enterNickName","enterRoomCode","enterRoll"]),
+    ...mapMutations(["setIsHost","clearState"]),
     create() {
       if (this.nicknameinput != "") {
         this.enterNickName(this.nicknameinput);
         axios
-          .post("https://j7a308.p.ssafy.io/api/room/create", {
+          .post("/api/room/create", {
             senderNickName: this.getSenderNickName,
           })
           .then( (response)=> {
             this.enterRoll("signee");
             console.log(response.data.roomCode);
             this.enterRoomCode(response.data.roomCode);
-            
+            this.setIsHost(true);
             this.$router.push({ name: "session" });
           })
           .catch( (error) =>{
