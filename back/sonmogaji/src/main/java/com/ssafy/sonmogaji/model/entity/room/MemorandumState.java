@@ -18,6 +18,7 @@ public class MemorandumState {
     private String memoryImage;
     private boolean memorySecret;
     private HashMap<String,String> sign;
+    private HashMap<String,Boolean> signState;
 //
     public MemorandumState(){
         Map<String, Boolean> map = new HashMap<String, Boolean>();
@@ -39,6 +40,7 @@ public class MemorandumState {
         this.memoryImage = "";
         this.memorySecret = false;
         this.sign = new HashMap<String,String>();
+        this.signState=new HashMap<>();
 
     }
 

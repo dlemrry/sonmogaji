@@ -6,6 +6,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.util.Date;
+import java.util.Map;
 
 @Getter
 @Setter
@@ -22,6 +23,9 @@ public class MemorandumAction {
     private Date expire;
     private boolean secret;
     private boolean memorySecret;
+    private String memoryImage;
+    private Map<String,Boolean> signState;
+    private String sign;
     private MemorandumState memorandumState;
 //	private String type;
 
