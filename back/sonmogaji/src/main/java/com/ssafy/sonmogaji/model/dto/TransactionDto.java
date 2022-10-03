@@ -50,7 +50,7 @@ public class TransactionDto {
 	private String txNftUrl;
 	
 	// 각서 서명자들
-	private List<String> signees;
+	private List<SigneeDto> signees;
 
 	public Transaction toTransaction() {
 		return Transaction.builder()

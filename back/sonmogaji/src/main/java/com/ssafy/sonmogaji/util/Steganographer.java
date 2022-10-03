@@ -49,7 +49,7 @@ public class Steganographer {
 
 	// Encode
 
-	public static void encode(File file, String textPath) {
+	public void encode(File file, String textPath) {
 		BufferedImage originalImage = getImageFromFile(file);
 		BufferedImage imageInUserSpace = getImageInUserSpace(originalImage);
 		String text = getTextFromTextFile(textPath);

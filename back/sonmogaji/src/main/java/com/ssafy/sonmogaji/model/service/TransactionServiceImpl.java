@@ -3,13 +3,21 @@ package com.ssafy.sonmogaji.model.service;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
 import javax.transaction.Transactional;
 
+import com.amazonaws.services.s3.AmazonS3;
+import com.amazonaws.services.s3.model.CannedAccessControlList;
+import com.amazonaws.services.s3.model.ObjectMetadata;
+import com.amazonaws.services.s3.model.PutObjectRequest;
+import com.ssafy.sonmogaji.model.dto.SigneeDto;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -23,6 +31,7 @@ import com.ssafy.sonmogaji.model.repository.TransactionRepository;
 import com.ssafy.sonmogaji.util.Steganographer;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.web.server.ResponseStatusException;
 
 @Service
 @RequiredArgsConstructor
@@ -31,12 +40,16 @@ public class TransactionServiceImpl implements TransactionService {
 	
 	private String uploadPath = File.separator + "app" + File.separator + "Feed";
 	private String frontPath = File.separator + "sonmogaji" + File.separator + "Feed";
+
+	@Value("${cloud.aws.s3.bucket}")
+	private String bucket;
 			
 	
 	private final TransactionRepository transactionRepository;
 	private final SigneeRepository signeeRepository;
 	private final MemberRepository memberRepository;
 	private final Steganographer steganographer;
+	private final AmazonS3 amazonS3;
 	
 	// 각서 인증하기
 	@Override
@@ -110,6 +123,35 @@ public class TransactionServiceImpl implements TransactionService {
 		return null;
 	}
 
+	// 각서 이미지 저장
+	public String uploadFile(MultipartFile file) {
+		String fileName = createFileName(file.getOriginalFilename());
+		ObjectMetadata objectMetadata = new ObjectMetadata();
+		objectMetadata.setContentLength(file.getSize());
+		objectMetadata.setContentType(file.getContentType());
+
+		try(InputStream inputStream = file.getInputStream()) {
+			amazonS3.putObject(new PutObjectRequest(bucket, fileName, inputStream, objectMetadata).withCannedAcl(CannedAccessControlList.PublicRead));
+		} catch (IOException e) {
+			throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "파일 업로드에 실패했습니다.");
+		}
+
+		return fileName;
+	}
+
+	private String createFileName(String fileName) {
+		return UUID.randomUUID().toString().concat(getFileExtension(fileName));
+	}
+
+	private String getFileExtension(String fileName) {
+		try{
+			return  fileName.substring(fileName.lastIndexOf("."));
+		} catch (StringIndexOutOfBoundsException e) {
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "잘못된 형식의 파일입니다");
+		}
+	}
+
+
 	// 각서 정보 저장
 	@Override
 	public void writeTransaction(TransactionDto transactionDto, MultipartFile file) {
@@ -132,10 +174,10 @@ public class TransactionServiceImpl implements TransactionService {
 		transactionRepository.save(transaction);
 		
 		// 각서 서명인들 저장
-		List<String> signeeDtos = transactionDto.getSignees(); 
-		for(String signeeDto : signeeDtos) {
-			Member member = memberRepository.findByMemberAddress(signeeDto).orElseGet(Member :: new);
-			Signee signee = Signee.builder().member(member).transaction(transaction).build();
+		List<SigneeDto> signeeDtos = transactionDto.getSignees();
+		for(SigneeDto signeeDto : signeeDtos) {
+			Member member = memberRepository.findByMemberAddress(signeeDto.getMemberAddress()).orElseGet(Member :: new);
+			Signee signee = Signee.builder().signeeID(0L).member(member).transaction(transaction).build();
 			signeeRepository.save(signee);
 		}
 		
