@@ -13,7 +13,7 @@
 </template>
 
 <script>
-import { mapState, mapActions, mapGetters } from "vuex";
+import { mapState, mapActions, mapGetters, mapMutations } from "vuex";
 export default {
   name: "RoomCode",
   components: {},
@@ -24,6 +24,7 @@ export default {
   created() {
     //url 에 roomcode 있으면 바로 별명페이지 route
     //6자리 숫자 roomcode
+    this.clearState();
 
   },
   mounted() {
@@ -37,6 +38,7 @@ export default {
   },
   methods: {
     ...mapActions(["enterRoomCode"]),
+    ...mapMutations(["clearState"]),
     next() {
       if (this.codeinput != "") {
         // console.log(this.codeinput)

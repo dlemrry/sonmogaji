@@ -22,7 +22,9 @@ export default {
     ...mapState(["senderNickName"]),
     ...mapGetters(["getSenderNickName"]),
   },
-  created() {},
+  created() {
+    this.clearState()
+  },
   mounted() {
     console.log("cnterNickname");
   },
@@ -34,7 +36,7 @@ export default {
   },
   methods: {
     ...mapActions(["enterNickName","enterRoomCode","enterRoll"]),
-    ...mapMutations(["setIsHost"]),
+    ...mapMutations(["setIsHost","clearState"]),
     create() {
       if (this.nicknameinput != "") {
         this.enterNickName(this.nicknameinput);

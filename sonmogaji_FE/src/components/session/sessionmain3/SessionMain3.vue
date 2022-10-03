@@ -95,6 +95,7 @@ export default {
   created() {
     //this.$router.push({name:"main1Slide1"})
     console.log("sessionMain3");
+    console.log(this.getIsHost)
   },
   computed: {
     ...mapState(["memorandumState", "agree3", "secret","isHost","expire"]),

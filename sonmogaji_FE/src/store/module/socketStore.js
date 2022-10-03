@@ -4,7 +4,7 @@ import SockJS from "sockjs-client";
 import routes from "../../router/index.js";
 const socketStore = {
   state: {
-    ishost: false,
+    isHost: false,
     roomCode: "",
     senderNickName: "",
     roll: "",
@@ -16,13 +16,13 @@ const socketStore = {
     agree3: 0,
     agree4: 0,
     agree5: 0,
-    sign: [],
+    sign: {},
     title: "",
     content: "",
     secret: "A",
     expire: "",
     memoryImage: "",
-    memorySecret: true,
+    memorySecret: "A",
     memorandumState: {
       agree: [],
 
@@ -158,6 +158,27 @@ const socketStore = {
     },
     setMemorandumState(state, memorandumstate) {
       state.memorandumState = memorandumstate;
+    },
+    clearState(state) {
+      state.roomCode = "";
+      state.senderNickName = "";
+      state.roll = "";
+      state.socket = "";
+      state.stomp = "";
+      state.chatmessages = "";
+      state.agree1 = 0;
+      state.agree2 = 0;
+      state.agree3 = 0;
+      state.agree4 = 0;
+      state.agree5 = 0;
+      state.sign = {};
+      state.title = "";
+      state.content = "";
+      state.secret = "A";
+      state.expire = "";
+      state.memoryImage = "";
+      state.memorySecret = "A";
+      state.memorandumState = { agree: [], sign: [] };
     },
   },
 
@@ -311,6 +332,16 @@ const socketStore = {
         })
       );
     },
+    sendMemoryImage({ commit, state }) {
+      state.stomp.send(
+        "/pub/memorandum/memoryimage",
+        {},
+        JSON.stringify({
+          memoryImage: state.memoryImage,
+          roomCode: state.roomCode,
+        })
+      );
+    },
     sendMemorySecret({ commit, state }) {
       let MemorySecret = true;
       if (state.memorySecret == "B") {
@@ -327,14 +358,23 @@ const socketStore = {
       );
     },
     sendDate({ commit, state }) {
-      
-
       state.stomp.send(
         "/pub/memorandum/expire",
         {},
         JSON.stringify({
           expire: state.expire,
           roomCode: state.roomCode,
+        })
+      );
+    },
+    sendSign({ commit, state },sign){
+      state.stomp.send(
+        "/pub/memorandum/sign",
+        {},
+        JSON.stringify({
+          sign: sign,
+          roomCode: state.roomCode,
+          senderNickName:state.senderNickName
         })
       );
     },
@@ -380,8 +420,10 @@ const socketStore = {
 
             if (content.message == "start") {
               commit("setMemorandumState", content.memorandumState);
+              commit("setSign",content.signState)
+
               dispatch("changeAgree1");
-              dispatch("changeSign");
+              // dispatch("changeSign");
 
               routes.push({ name: "sessionMain1" });
             } else {
@@ -393,23 +435,23 @@ const socketStore = {
             if (content.message == "1") {
               commit("setMemorandumState", content.memorandumState);
               dispatch("changeAgree1");
-              dispatch("changeSign");
+              // dispatch("changeSign");
             } else if (content.message == "2") {
               commit("setMemorandumState", content.memorandumState);
               dispatch("changeAgree2");
-              dispatch("changeSign");
+              // dispatch("changeSign");
             } else if (content.message == "3") {
               commit("setMemorandumState", content.memorandumState);
               dispatch("changeAgree3");
-              dispatch("changeSign");
+              // dispatch("changeSign");
             } else if (content.message == "4") {
               commit("setMemorandumState", content.memorandumState);
               dispatch("changeAgree4");
-              dispatch("changeSign");
+              // dispatch("changeSign");
             } else if (content.message == "5") {
               commit("setMemorandumState", content.memorandumState);
               dispatch("changeAgree5");
-              dispatch("changeSign");
+              // dispatch("changeSign");
             } else {
               console.log(content.message);
             }
@@ -446,33 +488,50 @@ const socketStore = {
               } else {
                 commit("setSecret", "B");
               }
+            } else {
+              console.log(content.message);
             }
-            else{
-              console.log(content.message)
+          });
+          state.stomp.subscribe("/sub/memorandum/memoryimage/" + state.roomCode, (res) => {
+            var content = JSON.parse(res.body);
+            if (content.message == "ok") {
+              commit("setMemoryImage", content.memoryImage);
+            } else {
+              console.log(content.message);
             }
+
+            //commit("setMemorandumState",content.memorandumState)
+            //commit("receiveChatmessages", { sender: content.sender, message: content.message });
           });
           state.stomp.subscribe("/sub/memorandum/expire/" + state.roomCode, (res) => {
             var content = JSON.parse(res.body);
-            if(content.message=="ok"){
-              console.log(content.memorandumState.expire)
-              commit("setExpire",content.memorandumState.expire)
+            if (content.message == "ok") {
+              console.log(content.memorandumState.expire);
+              commit("setExpire", content.memorandumState.expire);
+            } else {
+              console.log(content.message);
             }
-            else{
-              console.log(content.message)
-            }
-            
           });
           state.stomp.subscribe("/sub/memorandum/memorysecret/" + state.roomCode, (res) => {
             var content = JSON.parse(res.body);
             if (content.message == "ok") {
-              if (content.memorandumState.memorySecret) {
+              if (content.memorySecret) {
                 commit("setMemorySecret", "A");
               } else {
                 commit("setMemorySecret", "B");
               }
+            } else {
+              console.log(content.message);
             }
-            else{
-              console.log(content.message)
+          });
+          state.stomp.subscribe("/sub/memorandum/sign/" + state.roomCode, (res) => {
+            var content = JSON.parse(res.body);
+
+            if (content.message == "ok") {
+              console.log(content.signState)
+              commit("setSign",content.signState)
+            } else {
+              console.log(content.message);
             }
           });
 
