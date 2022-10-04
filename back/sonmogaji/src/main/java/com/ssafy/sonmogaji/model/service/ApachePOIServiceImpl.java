@@ -9,11 +9,14 @@ import lombok.RequiredArgsConstructor;
 import org.apache.poi.util.Units;
 import org.apache.poi.xwpf.usermodel.*;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.imageio.ImageIO;
 import javax.xml.bind.DatatypeConverter;
 import java.awt.image.BufferedImage;
 import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
 import java.util.Iterator;
 import java.util.List;
 
@@ -33,11 +36,15 @@ public class ApachePOIServiceImpl implements ApachePOIService{
         String sample = "memorandom.docx";
         FileOutputStream fos = null;
 
+        // 각서 원본 docx 파일 생성
         try {
+            // 각서 샘플파일 복사하기
             File file = new File(sample);
+            File newFile = new File("memorandom_preview.docx");
 
-            XWPFDocument doc = new XWPFDocument(new FileInputStream(file));
+            Files.copy(file.toPath(), newFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
 
+            XWPFDocument doc = new XWPFDocument(new FileInputStream(newFile));
             // 본문 입력하기
             for(XWPFParagraph p : doc.getParagraphs()) {
                 List<XWPFRun> runs = p.getRuns();
@@ -103,7 +110,7 @@ public class ApachePOIServiceImpl implements ApachePOIService{
 
             }
 
-            fos = new FileOutputStream(new File(sample));
+            fos = new FileOutputStream(new File("memorandom_preview.docx"));
             doc.write(fos);
 
             if(fos != null) fos.close();
@@ -113,10 +120,10 @@ public class ApachePOIServiceImpl implements ApachePOIService{
         }
 
         // 각서 이미지로 변환하기
-        File file = new File(sample);
+        File file = new File("memorandom_preview.docx");
 
         Document document = new Document();
-        document.loadFromFile(sample);
+        document.loadFromFile("memorandom_preview.docx");
 
         BufferedImage image = document.saveToImages(0, ImageType.Bitmap);
 
@@ -125,8 +132,10 @@ public class ApachePOIServiceImpl implements ApachePOIService{
     }
 
     @Override
-    public File createImg(File preview, String transactionAddress) {
+    public File createImg(MultipartFile file, String transactionAddress) throws IOException {
 
+        File preview = new File(file.getOriginalFilename());
+        file.transferTo(preview);
         steganographer.encode(preview, transactionAddress);
 
         return null;

@@ -123,7 +123,7 @@ public class TransactionServiceImpl implements TransactionService {
 		return null;
 	}
 
-	// 각서 이미지 저장
+	// 추억 이미지 저장
 	public String uploadFile(MultipartFile file) {
 		String fileName = createFileName(file.getOriginalFilename());
 		ObjectMetadata objectMetadata = new ObjectMetadata();
@@ -136,7 +136,7 @@ public class TransactionServiceImpl implements TransactionService {
 			throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "파일 업로드에 실패했습니다.");
 		}
 
-		return fileName;
+		return amazonS3.getUrl(bucket, fileName).toString();
 	}
 
 	private String createFileName(String fileName) {

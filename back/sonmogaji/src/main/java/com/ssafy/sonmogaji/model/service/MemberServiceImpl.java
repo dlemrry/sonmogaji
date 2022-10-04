@@ -11,6 +11,8 @@ import com.ssafy.sonmogaji.model.repository.MemberRepository;
 
 import lombok.RequiredArgsConstructor;
 
+import java.util.Random;
+
 @Service
 @RequiredArgsConstructor
 @Transactional
@@ -27,7 +29,7 @@ public class MemberServiceImpl implements MemberService {
 
 			Member member = Member.builder()
 					.memberAddress(memberAddress)
-					.nonce(null)
+					.nonce(new Random().nextInt())
 					.role(Role.USER)
 					.build();
 
@@ -55,5 +57,6 @@ public class MemberServiceImpl implements MemberService {
 	public void logout(String memberAddress, String accessToken) {
 		jwtTokenProvider.logout(memberAddress, accessToken);
 	}
+
 
 }
