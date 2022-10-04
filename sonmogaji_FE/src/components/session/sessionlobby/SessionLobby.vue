@@ -3,20 +3,21 @@
     <b-row>
       <b-col>
         <b-row>
-          <b-jumbotron bg-variant="info" text-variant="white" border-variant="dark">
-            <template #header>환영합니다!</template>
-
-            <template #lead>
-              화면에 내 별명이 보이나요?<br />모두 참여할 때 까지 기다려주세요.
-            </template>
-
-            <hr class="my-4" />
-          </b-jumbotron>
+          <div class="menu-box bg-navy shadow-lg rounded p-4">
+            <div class="mb-4">
+              <p class="h3">환영합니다!</p>
+              <p class="fw-light">화면에 내 별명이 보이나요?</p>
+              <p class="fw-light">모두 참여할 때 까지 기다려주세요.</p>
+            </div>
+          </div>
         </b-row>
         <b-row>
-          <b-jumbotron bg-variant="info" text-variant="white" border-variant="dark">
-            <template #header>방 코드<br />링크 복사</template>
-          </b-jumbotron>
+          <div class="menu-box bg-navy shadow-lg rounded p-4">
+            <b-row><b-col><p class="h3">방 코드</p></b-col> <b-col>{{this.getRoomCode}}</b-col></b-row>
+            <b-row><b-col><p class="h3">링크 복사</p></b-col> <b-col></b-col></b-row>
+
+          </div>
+
         </b-row>
       </b-col>
       <b-col>
@@ -29,26 +30,28 @@
 </template>
 
 <script>
-import {mapState,mapActions} from "vuex"
+import { mapState, mapActions, mapGetters } from "vuex";
+import axios from "axios"
 export default {
   name: "SessionLobby",
   components: {},
-  created() {
-    
-    
+  computed: {
+    ...mapGetters(["getRoomCode"]),
   },
-  mounted(){
+  created() {},
+  mounted() {
     console.log("sessionLobby");
-    this.stompConnect();
   },
   data() {
     return {};
   },
   methods: {
-    ...mapActions(["stompConnect"]),
+    ...mapActions(["memorandumStart","roomStart"]),
     start() {
       console.log("시작");
-      this.$router.push({ name: "sessionMain1" });
+      this.roomStart()
+      
+      // this.$router.push({ name: "sessionMain1" });
     },
   },
 };

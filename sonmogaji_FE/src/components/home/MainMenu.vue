@@ -24,11 +24,11 @@
             </div>
             <div class="d-flex justify-content-center text-center">
               <div class="mx-auto">
-                <b-icon class="icon-button mx-auto" icon="plus-square-dotted" />
+                <b-icon class="icon-button mx-auto" icon="plus-square-dotted" @click="createRoom" />
                 <p class="fw-light">방 생성하기</p>
               </div>
               <div class="mx-auto">
-                <b-icon class="icon-button mx-auto" icon="search" />
+                <b-icon class="icon-button mx-auto" icon="search" @click="joinRoom" />
                 <p class="fw-light">방 참여하기</p>
               </div>
             </div>
@@ -38,7 +38,7 @@
               <p class="h3">각서 인증하기</p>
               <p class="fw-light">친구의 각서가 진짜인지 알아봅시다</p>
             </div>
-            <div class="mx-auto text-center">
+            <div class="mx-auto text-center" @click="authImage">
               <b-icon class="icon-button mx-auto" icon="image" />
               <p class="fw-light">사진 업로드</p>
             </div>
@@ -63,6 +63,15 @@ export default {
       window.scrollTo({ left: 0, top: screen.height - 100, behavior: "smooth" });
       console.log("hi");
     },
+    createRoom() {
+      this.$router.push({ name: "createRoom" });
+    },
+    joinRoom() {
+      this.$router.push({ name: "beforeEnter" });
+    },
+    authImage() {
+      this.$router.push({ name: "upload" });
+    },
   },
 };
 </script>
@@ -75,5 +84,6 @@ export default {
   width: 60px;
   height: 60px;
   color: white;
+  cursor: pointer;
 }
 </style>

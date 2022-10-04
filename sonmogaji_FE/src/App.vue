@@ -1,5 +1,13 @@
 <template>
   <div id="app">
+    <!-- <nav>
+      <router-link to="/">Home</router-link> |
+      <router-link to="/about">About</router-link>
+      <router-link to="/beforeEnter">memorandum join</router-link>
+    <router-link to="/beforeEnter">memorandum create</router-link>
+    
+    </nav>
+    <router-view/> -->
     <HeaderNavBar id="header" />
     <RouterView id="section" />
     <FooterBar></FooterBar>

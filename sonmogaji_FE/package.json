@@ -12,14 +12,15 @@
     "bootstrap": "^5.2.1",
     "bootstrap-vue": "^2.22.0",
     "core-js": "^3.8.3",
+    "net": "^1.0.2",
+    "stompjs": "^2.3.3",
     "keen-slider": "^6.8.2",
     "sockjs-client": "^1.6.1",
     "v-animate-css": "^0.0.5",
     "vue": "^2.7.10",
     "vue-router": "^3.5.1",
     "vuex": "^3.6.2",
-    "vuex-persistedstate": "^4.1.0",
-    "webstomp-client": "^1.2.6"
+    "vuex-persistedstate": "^4.1.0"
   },
   "devDependencies": {
     "@babel/core": "^7.12.16",

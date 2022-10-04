@@ -3,7 +3,7 @@ import Vuex from "vuex";
 import createPersistedState from "vuex-persistedstate";
 
 import apiStore from "@/store/module/apiStore";
-import socketStore from "@/store/module/apiStore";
+import socketStore from "@/store/module/socketStore";
 import userStore from "@/store/module/userStore";
 
 Vue.use(Vuex);

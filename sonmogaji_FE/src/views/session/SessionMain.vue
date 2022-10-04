@@ -1,21 +1,40 @@
 <template>
   <b-container>
-    <router-view> </router-view>
-    <Chatt />
+    <b-row>
+      <b-col cols="9"><router-view> </router-view></b-col>
+      <b-col cols="3"> <Chatt :roomId="roomId" /></b-col
+    ></b-row>
   </b-container>
 </template>
 
 <script>
-import SessionMain1 from "../../components/session/sessionmain1/SessionMain1";
-import Chatt from "./SessionChat.vue";
+import Chatt from "../../components/session/SessionChat.vue";
+
+import { mapState, mapActions, mapGetters, mapMutations } from "vuex";
+import { map } from 'sockjs-client/lib/transport-list';
 export default {
   name: "SessionMain",
+  data() {
+    return {
+      ...mapState(["roomId","senderNickName"]),
+      ...mapGetters(["getRoomId","getSenderNickName"])
+    };
+  },
   components: {
-    Chatt,
+    Chatt
   },
   created() {
-    console.log('sessionMain')
+    console.log("sessionMain");
+    // this.enterRoomId("testroom")
+    this.stompConnect();
+    //stomp room join
   },
-  
+  destroyed(){
+    console.log('disconnect')
+    this.stompDisconnect();
+  },
+  methods: {
+    ...mapActions(["stompConnect","enterRoomId","stompDisconnect"]),
+  },
 };
 </script>
