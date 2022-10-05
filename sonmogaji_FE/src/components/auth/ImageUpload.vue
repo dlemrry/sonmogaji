@@ -2,9 +2,19 @@
   <div id="image-upload" class="d-flex justify-content-center">
     <div class="d-inline text-center">
       <h1 class="display-4 fw-semibold my-4">각서 이미지를 검증합니다.</h1>
-      <div class="w-50 mx-auto" @click="showModal">
+      <Dropzone
+        id="dropzone"
+        ref="dropzone"
+        class="w-50 mx-auto rounded"
+        :options="dropOptions"
+        :useCustomSlot="true"
+        style="border: 0px; background-color: transparent"
+        @vdropzone-upload-progress="uploadProgress"
+        @vdropzone-success="uploadSuccess"
+        @vdropzone-canceled="uploadFailed"
+      >
         <img src="@/assets/icons/image-upload.png" class="w-100" />
-      </div>
+      </Dropzone>
       <div>
         <p class="h4 my-3" style="color: #f16b51">
           * 주의사항 : 화질 변경 시 트랜잭션 해시가 인식 불가능 할 수도 있습니다.
@@ -16,7 +26,7 @@
       </div>
     </div>
     <b-modal id="modal" ref="modal" :title="modalData.title" @hidden="hideModal()">
-      <div v-if="isSuccessed == true">
+      <div v-if="modalData.isSuccessed == true">
         <div>
           <img src="@/assets/icons/success.png" />
         </div>
@@ -30,10 +40,21 @@
   </div>
 </template>
 <script>
+import Dropzone from "vue2-dropzone";
+import "vue2-dropzone/dist/vue2Dropzone.min.css";
+
 export default {
   name: "ImageUpload",
+  components: {
+    Dropzone,
+  },
   data() {
     return {
+      dropOptions: {
+        url: "/api/transaction/verify", // 파일을 업로드할 서버 주소 url.
+        maxFiles: 1, // 업로드 파일수
+        acceptedFiles: ".jpeg,.jpg,.png,.gif,.JPEG,.JPG,.PNG,.GIF", // 이미지 파일 포맷만 허용
+      },
       modalData: {
         isSuccessed: true,
         hash: "",
@@ -49,8 +70,22 @@ export default {
       this.modalData.title = "^___^";
     },
     hideModal() {
-      this.slider.emit("updated");
       // this.rotateList();
+    },
+    uploadProgress(file, progress, bytesSent) {
+      console.log("파일 업로드 진행...", progress);
+      console.log(file);
+      console.log(bytesSent);
+    },
+    uploadSuccess(file, response) {
+      this.isSuccessed = true;
+      this.showModal();
+      console.log(response);
+    },
+    uploadFailed(file, response) {
+      this.isSuccessed = false;
+      this.hideModal();
+      console.log(response);
     },
   },
 };

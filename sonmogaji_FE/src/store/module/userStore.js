@@ -22,18 +22,24 @@ const userStore = {
       commit("SET_ACCOUNT", null);
     },
     async login({ commit }) {
-      /* 메타 마스크 로그인 로직 구현 */
       // 00. 지갑 연결하기
       const accounts = await window.ethereum.request({ method: "eth_requestAccounts" });
       commit("SET_IS_LOGGED_IN", true);
       commit("SET_ACCOUNT", accounts[0]);
+
       // 01. 네트워크 전환 시도하기
+      /*
       try {
         await window.ethereum.request({
           method: "wallet_switchEthereumChain",
           params: [{ chainId: "0x539" }],
         });
-      } catch (error) {
+      }
+      */
+
+      // 02. 에러 발생 시, 네트워크 생성하기
+      /*
+      catch (error) {
         if (error.code === 4902) {
           try {
             const result = await window.ethereum.request({
@@ -57,7 +63,9 @@ const userStore = {
         }
         console.error("error : " + error);
       }
-      // 02. 에러 발생 시, 네트워크 생성하기
+      */
+
+      // 03. 홈 화면으로 이동하기
       location.replace("/");
     },
     checkMetamaskSupported({ commit }) {
