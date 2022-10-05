@@ -1,6 +1,7 @@
 package com.ssafy.sonmogaji.controller;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.List;
 
 import com.ssafy.sonmogaji.model.service.ApachePOIService;
@@ -58,8 +59,9 @@ public class TransactionController {
 
     // 각서 이미지 만들기
     @PostMapping("/createImg")
-    public ResponseEntity<?> createImg() {
+    public ResponseEntity<?> createImg(@RequestPart(name = "file", required = false) MultipartFile preview, String txAddress) throws IOException {
 
+            apachePOIService.createImg(preview, txAddress);
         return null;
     }
 
