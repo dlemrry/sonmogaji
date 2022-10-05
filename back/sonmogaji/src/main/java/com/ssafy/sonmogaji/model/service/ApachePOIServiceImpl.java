@@ -99,8 +99,8 @@ public class ApachePOIServiceImpl implements ApachePOIService{
 
                 int imgType = XWPFDocument.PICTURE_TYPE_PNG;
                 String imgFileName = transactionDto.getSignees().get(i).getSigneeName();
-                int width = 200;
-                int height = 100;
+                int width = 100;
+                int height = 50;
 
                 XWPFParagraph paragraph = doc.createParagraph();
                 XWPFRun run = paragraph.createRun();
@@ -108,8 +108,11 @@ public class ApachePOIServiceImpl implements ApachePOIService{
 
                 row.getCell(1).setParagraph(paragraph);
 
-            }
+                if(paragraph != null) {
+                    doc.removeBodyElement(doc.getPosOfParagraph(paragraph));
+                }
 
+            }
             fos = new FileOutputStream(new File("memorandom_preview.docx"));
             doc.write(fos);
 
@@ -127,10 +130,10 @@ public class ApachePOIServiceImpl implements ApachePOIService{
 
         BufferedImage image = document.saveToImages(0, ImageType.Bitmap);
 
+        File imgFile = new File("Preview.PNG");
+        ImageIO.write(image, "PNG", imgFile);
         return image;
 
-//        File imgFile = new File("Preview.PNG");
-//        ImageIO.write(image, "PNG", imgFile);
     }
 
     @Override
