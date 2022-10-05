@@ -2,6 +2,7 @@
   <div id="image-upload" class="d-flex justify-content-center">
     <div class="d-inline text-center">
       <h1 class="display-4 fw-semibold my-4">각서 이미지를 검증합니다.</h1>
+      <button @click="sendTransaction">누럴용</button>
       <Dropzone
         id="dropzone"
         ref="dropzone"
@@ -9,9 +10,7 @@
         :options="dropOptions"
         :useCustomSlot="true"
         style="border: 0px; background-color: transparent"
-        @vdropzone-upload-progress="uploadProgress"
-        @vdropzone-success="uploadSuccess"
-        @vdropzone-canceled="uploadFailed"
+        @vdropzone-complete="verifyResponse"
       >
         <img src="@/assets/icons/image-upload.png" class="w-100" />
       </Dropzone>
@@ -40,16 +39,39 @@
   </div>
 </template>
 <script>
+import { mapState } from "vuex";
 import Dropzone from "vue2-dropzone";
 import "vue2-dropzone/dist/vue2Dropzone.min.css";
+
+const Web3 = require("web3");
+const rpcURL = "http://j7a3081.p.ssafy.io:8545";
+const web3 = new Web3(rpcURL);
+
+const fake = {
+  txAddress: "sdfsdhjflk",
+  txTitle: "소고기 각서",
+  txContent: "취직한 사람 소고기 사세요",
+  imageTitle: "추억사진",
+  imageUrl: "s3.image",
+  imageIsSecret: false,
+  txIsSecret: false,
+  txCreateDate: null,
+  txExpDate: null,
+  txNftUrl: "",
+  signees: [],
+};
 
 export default {
   name: "ImageUpload",
   components: {
     Dropzone,
   },
+  computed: {
+    ...mapState("userStore", ["account"]),
+  },
   data() {
     return {
+      imageFile: null,
       dropOptions: {
         url: "/api/transaction/verify", // 파일을 업로드할 서버 주소 url.
         maxFiles: 1, // 업로드 파일수
@@ -72,20 +94,46 @@ export default {
     hideModal() {
       // this.rotateList();
     },
-    uploadProgress(file, progress, bytesSent) {
-      console.log("파일 업로드 진행...", progress);
-      console.log(file);
-      console.log(bytesSent);
+    sendTransaction() {
+      const types = ["string", "string", "string"];
+      const values = ["Hello", "World", "Web3"];
+      const abi = web3.eth.abi.encodeParameters(types, values);
+      console.log(abi);
+      const transactionParameters = {
+        nonce: "0x00", // ignored by MetaMask
+        gasPrice: "0x09184e72a000", // customizable by user during MetaMask confirmation.
+        gas: "0x2710", // customizable by user during MetaMask confirmation.
+        to: "0x0000000000000000000000000000000000000000", // Required except during contract publications.
+        from: this.account, // must match user's active address.
+        value: "0x00", // Only required to send ether to the recipient from the initiating external account.
+        data: abi, // Optional, but used for defining smart contract creation and interaction.
+        chainId: "0x569", // Used to prevent transaction reuse across blockchains. Auto-filled by MetaMask.
+      };
+      window.ethereum
+        .request({
+          method: "eth_sendTransaction",
+          params: [transactionParameters],
+        })
+        .then(console.log);
     },
-    uploadSuccess(file, response) {
-      this.isSuccessed = true;
-      this.showModal();
-      console.log(response);
-    },
-    uploadFailed(file, response) {
-      this.isSuccessed = false;
-      this.hideModal();
-      console.log(response);
+    async verifyResponse(response) {
+      // const txHash = response.xhr.response;
+      const txHash = "0x01f3df6f342e68b0725a839b1e911749835d8cedd37e6c4e98de3ce54ee33d5c";
+
+      /* web3.js 조회 로직 구현*/
+
+      web3.eth.getTransaction(txHash).then((data) => {
+        if (data == null) {
+          this.isSuccessed = false;
+          this.showModal();
+        } else {
+          /*
+
+          */
+          this.isSuccessed = true;
+          this.showModal();
+        }
+      });
     },
   },
 };
