@@ -86,7 +86,9 @@ public class ApachePOIServiceImpl implements ApachePOIService{
 
             for(int i = 0; i < transactionDto.getSignees().size(); i++ ) {
                 XWPFTableRow row = table.getRow(i);
-                row.getCell(0).setText(transactionDto.getSignees().get(i).getMemberAddress());
+//                row.getCell(0).setText(transactionDto.getSignees().get(i).getMemberAddress());
+
+                row.getCell(0).setText(transactionDto.getSignees().get(i).getSigneeName());
 
                 // 사인 이미지 넣기
                 String data = transactionDto.getSignees().get(i).getSignBase64().split(",")[1];

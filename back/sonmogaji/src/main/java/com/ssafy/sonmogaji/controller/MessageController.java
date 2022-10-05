@@ -21,6 +21,7 @@ import org.web3j.abi.datatypes.Bool;
 import org.web3j.crypto.Hash;
 
 import java.awt.image.BufferedImage;
+import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -269,8 +270,9 @@ public class MessageController {
         Room r = roomList.findRoomByRoomCode(message.getRoomCode());
         if (r.startRoom(headerAccessor.getSessionId())) {
 
-            r.getMemorandumState().setExpire(message.getExpire());
-
+//            SimpleDateFormat dformat = new SimpleDateFormat("yyyy-MM-dd");
+//            r.getMemorandumState().setExpire(dformat.parse(message.getExpire()));
+            log.info(message.getExpire());
             message.setMessage("ok");
             message.setMemorandumState(r.getMemorandumState());
             template.convertAndSend("/sub/memorandum/expire/" + message.getRoomCode(), message);
@@ -329,7 +331,8 @@ public class MessageController {
 
                 sDto.setSigneeName(name);
                 sDto.setSignBase64(elem.getValue());
-
+                sList.add(sDto);
+                log.info("sign : "+sDto.getSigneeName() + " "+ sDto.getSignBase64());
             }
 
 
