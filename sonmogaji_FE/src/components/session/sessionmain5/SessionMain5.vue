@@ -1,4 +1,5 @@
 <template>
+<div id="main5">
   <b-container>
     <b-row>
       <b-col cols="1">
@@ -14,22 +15,24 @@
       <b-col><b-row class="bar" /></b-col>
       <b-col cols="1"><b-row class="circledot" /><b-row>최종 확인</b-row></b-col>
     </b-row>
-    <b-row>
-      <b-row v-for="(value, key,index) in this.getSign" v-bind:key="index">
-        <b-col> 
+    <br/><br/>
+    <b-row  align-h="center">
+      <b-row  align-h="center" v-for="(value, key,index) in this.getSign" v-bind:key="index">
+        <b-col cols="3" class="content"> 
           {{key}}
         </b-col>
-        <b-col v-if="value"> 
+        <b-col cols="3" class="content" v-if="value"> 
           OK
         </b-col>
-        <b-col v-else> 
+        <b-col cols="3"  class="content" v-else> 
           X
         </b-col>
       </b-row>
     </b-row>
-    <b-row>각서에 서명하세요!</b-row>
-    <b-row>
-      <b-col
+    <br/>
+    <b-row class="title" align-h="center">각서에 서명하세요!</b-row><br/>
+    <b-row >
+      <b-col class="content"
         ><canvas
           id="myCanvas"
           width="300"
@@ -40,21 +43,23 @@
       /></b-col>
     </b-row>
     <b-row>
-      <b-col><b-button @click="sendsign">서명 완료</b-button></b-col>
-    </b-row>
+      <b-col class="content"><b-button @click="sendsign">서명 완료</b-button></b-col>
+    </b-row><br/><br/>
 
     <b-row>
-      <b-col
+      <b-col class="agreestate"
         >{{ this.getAgree5 }} / {{ Object.keys(this.getMemorandumState.agree[4]).length - 1 }} 명이
         서명했습니다</b-col
       >
-    </b-row>
+    </b-row><br/>
 
     <b-row>
-      <b-col><b-button @click="toMain6">진행</b-button></b-col>
+      <b-col class="content"><b-button @click="toMain6">진행</b-button></b-col>
       <!-- <b-col><b-button @click="vote5">동의</b-button></b-col> -->
     </b-row>
+    <br/><br/>
   </b-container>
+</div>
 </template>
 
 <script>
@@ -169,5 +174,24 @@ export default {
 }
 #myCanvas {
   border: 1px solid grey;
+}
+
+#preview {
+  width: auto;
+  height: 300px;
+}
+
+#main5 {
+  /* height: 70vh; */
+}
+.title {
+  font-size: x-large;
+}
+.content {
+  text-align: center;
+}
+.agreestate {
+  text-align: center;
+  color: red;
 }
 </style>
