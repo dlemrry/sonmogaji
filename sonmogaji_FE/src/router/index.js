@@ -1,6 +1,8 @@
 import Vue from "vue";
 import VueRouter from "vue-router";
-import HomeView from "../views/HomeView.vue";
+import HomeView from "@/views/HomeView.vue";
+import UserView from "@/views/UserView.vue";
+
 //import sessionMain from '../views/session/SessionMain.vue'
 import sessionMain1 from "../components/session/sessionmain1/SessionMain1.vue";
 
@@ -13,12 +15,33 @@ const routes = [
     component: HomeView,
   },
   {
-    path: "/about",
-    name: "about",
-    // route level code-splitting
-    // this generates a separate chunk (about.[hash].js) for this route
-    // which is lazy-loaded when the route is visited.
-    component: () => import("../views/AboutView.vue"),
+    path: "/user",
+    name: "user",
+    component: UserView,
+    children: [
+      {
+        path: "login",
+        name: "login",
+        component: () => import("@/components/user/MetamaskLogin.vue"),
+      },
+      {
+        path: "myPage",
+        name: "myPage",
+        component: () => import("@/components/user/MyPage.vue"),
+      },
+    ],
+  },
+  {
+    path: "/auth",
+    name: "auth",
+    component: () => import("@/views/AuthView.vue"),
+    children: [
+      {
+        path: "upload",
+        name: "upload",
+        component: () => import("@/components/auth/ImageUpload.vue"),
+      },
+    ],
   },
   {
     path: "/createRoom",

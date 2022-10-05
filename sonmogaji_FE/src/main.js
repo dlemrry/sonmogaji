@@ -7,6 +7,7 @@ import Vuex from "vuex";
 // Import Bootstrap and BootstrapVue CSS files (order is important)
 import "bootstrap/dist/css/bootstrap.css";
 import "bootstrap-vue/dist/bootstrap-vue.css";
+
 import VAnimateCss from "v-animate-css";
 
 // Make BootstrapVue available throughout your project

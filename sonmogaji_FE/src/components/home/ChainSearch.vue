@@ -18,17 +18,6 @@
         <img class="item mx-5" :src="getImageSrc(index)" @click="showModal(item.hash)" />
       </div>
     </div>
-
-    <!-- <transition-group
-      name="fade"
-      tag="ul"
-      class="d-flex"
-      style="overflow: hidden; list-style: none"
-    >
-      <li v-for="(item, index) in chainList" :key="item.hash">
-        <img class="item mx-5" :src="getImageSrc(index)" @click="showModal(item.hash)" />
-      </li>
-    </transition-group> -->
     <b-modal id="modal" ref="modal" :title="modalData.title" @hidden="hideModal()">
       {{ modalData.hash }}
     </b-modal>
