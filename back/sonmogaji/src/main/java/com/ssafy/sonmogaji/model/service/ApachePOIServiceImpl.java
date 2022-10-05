@@ -52,15 +52,29 @@ public class ApachePOIServiceImpl implements ApachePOIService{
                     for(XWPFRun r : runs) {
                         String text = r.getText(0);
                         if(text != null && text.contains("제목")) {
-                            text = text.concat(transactionDto.getTxTitle());
+                            text = text.replace("제목", transactionDto.getTxTitle());
+//                            text = text.concat(transactionDto.getTxTitle());
                             r.setText(text, 0);
                         }
                         if(text != null && text.contains("내용")) {
-                            text = text.concat(transactionDto.getTxContent());
+                            text = text.replace("내용", transactionDto.getTxContent());
+//                            text = text.concat(transactionDto.getTxContent());
                             r.setText(text, 0);
                         }
+
+                        if(text != null && text.contains("만료일")) {
+
+                            if(transactionDto.getTxExpDate() == null) {
+                                text = text.replace("만료일", "만료일: " + "무기한");
+                            } else {
+                                text = text.replace("만료일", "만료일: " + transactionDto.getTxExpDate().toString());
+                            }
+                            r.setText(text, 0);
+                        }
+
                         if(text != null && text.contains("날짜")) {
-                            text = text.concat(transactionDto.getTxCreateDate().toString());
+                            text = text.replace("날짜", transactionDto.getTxCreateDate().toString());
+//                            text = text.concat(transactionDto.getTxCreateDate().toString());
                             r.setText(text, 0);
                         }
                     }
@@ -86,8 +100,6 @@ public class ApachePOIServiceImpl implements ApachePOIService{
 
             for(int i = 0; i < transactionDto.getSignees().size(); i++ ) {
                 XWPFTableRow row = table.getRow(i);
-//                row.getCell(0).setText(transactionDto.getSignees().get(i).getMemberAddress());
-
                 row.getCell(0).setText(transactionDto.getSignees().get(i).getSigneeName());
 
                 // 사인 이미지 넣기
