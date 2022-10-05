@@ -1,10 +1,12 @@
 <template>
+<div>
   <b-container>
     <b-row>
       <b-col cols="9"><router-view> </router-view></b-col>
       <b-col cols="3"> <Chatt :roomId="roomId" /></b-col
     ></b-row>
   </b-container>
+</div>
 </template>
 
 <script>

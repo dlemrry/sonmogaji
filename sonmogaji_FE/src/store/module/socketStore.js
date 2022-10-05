@@ -416,22 +416,18 @@ const socketStore = {
           commit("setChatmessages", [{}, {}]);
           console.log(state.chatmessages);
           console.log("소켓 연결 성공" + state.senderNickName + " " + state.roomCode);
-          state.stomp.send(
-            "/pub/memorandum/join",
-            {},
-            JSON.stringify({
-              roomCode: state.roomCode,
-              senderNickName: state.senderNickName,
-            })
-          );
+          
 
           state.stomp.subscribe("/sub/memorandum/join/" + state.roomCode, (res) => {
             var content = JSON.parse(res.body);
             console.log(content);
             if (content.message != "ok") {
               dispatch("stompDisconnect");
+              
               // this.stompDisconnect();
             }
+            commit("setSign", content.signState);
+              console.log(state.sign)
           });
           state.stomp.subscribe("/sub/memorandum/start/" + state.roomCode, (res) => {
             var content = JSON.parse(res.body);
@@ -576,6 +572,14 @@ const socketStore = {
 
             commit("receiveChatmessages", { sender: content.sender, message: content.message });
           });
+          state.stomp.send(
+            "/pub/memorandum/join",
+            {},
+            JSON.stringify({
+              roomCode: state.roomCode,
+              senderNickName: state.senderNickName,
+            })
+          );
         },
         (error) => {
           // 소켓 연결 실패
