@@ -14,23 +14,44 @@
       <b-col><b-row class="activebar" /></b-col>
       <b-col cols="1"><b-row class="activecircledot" /><b-row>최종 확인</b-row></b-col>
     </b-row>
-    <b-row>불만이 있다면 지금 얘기하세요!</b-row>
+
     <b-row>
-      
+      <b-col>
+        <img :src="this.getMemorandumPreview"  id="memorandumpreview" />
+
+      </b-col>
+    </b-row>
+    <b-row>불만이 있다면 지금 얘기하세요!</b-row>
+    
+    <b-row>
+      <b-col
+        >{{ this.getAgree6 }} / {{ Object.keys(this.getMemorandumState.agree[5]).length - 1 }} 명이
+        동의했습니다</b-col
+      >
+    </b-row>
+
+    <b-row>
+      <b-col><b-button @click="toMain7">진행</b-button></b-col>
+      <b-col><b-button @click="vote6">동의</b-button></b-col>
     </b-row>
     
   </b-container>
 </template>
 
 <script>
+import { mapActions, mapGetters, mapMutations, mapState } from 'vuex';
 export default {
   name: "SessionMain6",
   components: {},
   created() {
+    this.sendRequirePreview();
     
     console.log("sessionMain6");
   },
   computed: {
+    ...mapState(["memorandumPreview","agree6","memorandumState"]),
+    ...mapGetters(["getMemorandumPreview","getAgree6","getMemorandumState"]),
+
     
   },
   data() {
@@ -38,6 +59,13 @@ export default {
     };
   },
   methods: {
+    ...mapActions(["sendRequirePreview"]),
+    toMain7() {
+      this.roomNext(7);
+    },
+    vote6() {
+      this.roomVote(6);
+    },
     
   },
 };
