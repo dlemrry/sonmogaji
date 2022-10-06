@@ -1,4 +1,3 @@
-// import Stomp from "webstomp-client";
 import Stomp from "stompjs";
 import SockJS from "sockjs-client";
 import routes from "../../router/index.js";
@@ -27,13 +26,11 @@ const socketStore = {
     memorandumPreview: "",
     memorandumState: {
       agree: [],
-
       sign: [],
     },
     memorandumFinal:{},
     memorandumFinalImage:"",
   },
-
   getters: {
     getRoomCode(state) {
       return state.roomCode;
@@ -89,7 +86,6 @@ const socketStore = {
     getAgree5(state) {
       return state.agree5;
     },
-
     getSign(state) {
       return state.sign;
     },
@@ -106,7 +102,6 @@ const socketStore = {
       return state.memorandumFinalImage
     }
   },
-
   mutations: {
     setRoomCode(state, roomCode) {
       state.roomCode = roomCode;
@@ -138,7 +133,6 @@ const socketStore = {
     setMemorySecret(state, memorySecret) {
       state.memorySecret = memorySecret;
     },
-
     setStomp(state, stomp) {
       state.stomp = stomp;
     },
@@ -205,7 +199,6 @@ const socketStore = {
       state.memorandumFinalImage = memorandumFinalImage;
     },
   },
-
   actions: {
     enterNickName({ commit, state }, senderNickName) {
       commit("setSenderNickName", senderNickName);
@@ -272,10 +265,8 @@ const socketStore = {
           signstate.push(t);
         }
       });
-
       commit("setSign", signstate);
     },
-
     roomStart({ commit, state }) {
       state.stomp.send(
         "/pub/memorandum/start",
@@ -346,7 +337,6 @@ const socketStore = {
       if (state.secret == "B") {
         secret = false;
       }
-
       state.stomp.send(
         "/pub/memorandum/secret",
         {},
@@ -371,7 +361,6 @@ const socketStore = {
       if (state.memorySecret == "B") {
         MemorySecret = false;
       }
-
       state.stomp.send(
         "/pub/memorandum/memorysecret",
         {},
@@ -428,19 +417,16 @@ const socketStore = {
       commit("setSocket", new SockJS(serverURL));
       console.log(state.socket);
       console.log("param nick : " + state.senderNickName);
-
       commit("setStomp", Stomp.over(state.socket));
       console.log(state.stomp);
       state.stomp.connect(
         {},
         () => {
           state.stomp.connected = true;
-
           commit("setStomp", state.stomp);
           commit("setChatmessages", [{}, {}]);
           console.log(state.chatmessages);
           console.log("소켓 연결 성공" + state.senderNickName + " " + state.roomCode);
-          
 
           state.stomp.subscribe("/sub/memorandum/join/" + state.roomCode, (res) => {
             var content = JSON.parse(res.body);
@@ -456,14 +442,11 @@ const socketStore = {
           state.stomp.subscribe("/sub/memorandum/start/" + state.roomCode, (res) => {
             var content = JSON.parse(res.body);
             console.log(content);
-
             if (content.message == "start") {
               commit("setMemorandumState", content.memorandumState);
-              commit("setSign", content.signState);
-
+              commit("setSign",content.signState)
               dispatch("changeAgree1");
               // dispatch("changeSign");
-
               routes.push({ name: "sessionMain1" });
             } else {
               console.log(content.message);
@@ -517,7 +500,6 @@ const socketStore = {
               console.log(content.message);
             }
           });
-
           state.stomp.subscribe("/sub/memorandum/content/" + state.roomCode, (res) => {
             var content = JSON.parse(res.body);
             commit("setTitle", content.title);
@@ -544,7 +526,6 @@ const socketStore = {
             } else {
               console.log(content.message);
             }
-
             //commit("setMemorandumState",content.memorandumState)
             //commit("receiveChatmessages", { sender: content.sender, message: content.message });
           });
@@ -571,7 +552,6 @@ const socketStore = {
           });
           state.stomp.subscribe("/sub/memorandum/sign/" + state.roomCode, (res) => {
             var content = JSON.parse(res.body);
-
             if (content.message == "ok") {
               console.log(content.signState);
               commit("setSign", content.signState);
@@ -606,7 +586,6 @@ const socketStore = {
 
           state.stomp.subscribe("/sub/chat/message/" + state.roomCode, (res) => {
             var content = JSON.parse(res.body);
-
             commit("receiveChatmessages", { sender: content.sender, message: content.message });
           });
           
@@ -635,5 +614,4 @@ const socketStore = {
     },
   },
 };
-
 export default socketStore;
