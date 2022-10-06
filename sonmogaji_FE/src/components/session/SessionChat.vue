@@ -6,7 +6,7 @@
           <li v-if="message.sender===getSenderNickName" class="message message-out"> 
             {{ message.message }}
           </li>
-          <li v-if="message.sender!=getSenderNickName" class="message message-in"> 
+          <li v-else class="message message-in"> 
             {{ message.message }}
           </li>
           

@@ -440,7 +440,7 @@ const socketStore = {
         () => {
           state.stomp.connected = true;
           commit("setStomp", state.stomp);
-          commit("setChatmessages", [{}, {}]);
+          commit("setChatmessages", []);
           console.log(state.chatmessages);
           console.log("소켓 연결 성공" + state.senderNickName + " " + state.roomCode);
 
