@@ -38,7 +38,7 @@ public class ApachePOIServiceImpl implements ApachePOIService{
     @Override
     public BufferedImage createPreview(TransactionDto transactionDto,String sessionId) throws Exception {
         String sample = "src/main/resources/static/memorandom.docx";
-        String sample2 = String.valueOf(amazonS3.getUrl("sonmogaji", "memorandom"));
+        String sample2 = String.valueOf(amazonS3.getUrl("sonmogaji", "memorandom.docx"));
 
         FileOutputStream fos = null;
 
