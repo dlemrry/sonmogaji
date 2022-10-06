@@ -16,7 +16,8 @@
       </Dropzone>
       <div>
         <p class="h4 my-3" style="color: #f16b51">
-          * 주의사항 : 화질 변경 시 트랜잭션 해시가 인식 불가능 할 수도 있습니다.
+          * 주의사항 : 화질 변경 시 트랜잭션 해시가 인식 불가능 할 수도
+          있습니다.
         </p>
         <p class="h3 fw-light mt-3">
           손모가지가 발급한 각서 원본 이미지를 업로드하세요!<br />
@@ -24,7 +25,12 @@
         </p>
       </div>
     </div>
-    <b-modal id="modal" ref="modal" :title="modalData.title" @hidden="hideModal()">
+    <b-modal
+      id="modal"
+      ref="modal"
+      :title="modalData.title"
+      @hidden="hideModal()"
+    >
       <div v-if="modalData.isSuccessed == true">
         <div>
           <img src="@/assets/icons/success.png" />
@@ -44,7 +50,7 @@ import Dropzone from "vue2-dropzone";
 import "vue2-dropzone/dist/vue2Dropzone.min.css";
 
 const Web3 = require("web3");
-const rpcURL = "http://j7a3081.p.ssafy.io:8545";
+const rpcURL = "https://j7a3081.p.ssafy.io";
 const web3 = new Web3(rpcURL);
 
 const fake = {
@@ -53,12 +59,12 @@ const fake = {
   txContent: "취직한 사람 소고기 사세요",
   imageTitle: "추억사진",
   imageUrl: "s3.image",
-  imageIsSecret: false,
-  txIsSecret: false,
-  txCreateDate: null,
-  txExpDate: null,
-  txNftUrl: "",
-  signees: [],
+  imageIsSecret: "false",
+  txIsSecret: "false",
+  txCreateDate: "null",
+  txExpDate: "null",
+  txNftUrl: "null",
+  signees: "abc",
 };
 
 export default {
@@ -95,31 +101,39 @@ export default {
       // this.rotateList();
     },
     sendTransaction() {
+      // /* */
       const types = ["string", "string", "string"];
       const values = ["Hello", "World", "Web3"];
       const abi = web3.eth.abi.encodeParameters(types, values);
-      console.log(abi);
-      const transactionParameters = {
+      // console.log(abi);
+      // console.log(web3.eth.abi.decodeParameters(types, abi));
+      // const memorandumTypes = new Array(11).fill("string");
+      // const memorandumValues = Object.keys(fake).map(function (key) { return fake[key]; });
+      // const abi = web3.eth.abi.encodeParameters(memorandumTypes, memorandumValues);
+      const txParams = {
         nonce: "0x00", // ignored by MetaMask
-        gasPrice: "0x09184e72a000", // customizable by user during MetaMask confirmation.
-        gas: "0x2710", // customizable by user during MetaMask confirmation.
-        to: "0x0000000000000000000000000000000000000000", // Required except during contract publications.
+        gasPrice: "0x00", // customizable by user during MetaMask confirmation.
+        gas: "0x00", // customizable by user during MetaMask confirmation.
+        to: this.account, // Required except during contract publications.
         from: this.account, // must match user's active address.
         value: "0x00", // Only required to send ether to the recipient from the initiating external account.
         data: abi, // Optional, but used for defining smart contract creation and interaction.
         chainId: "0x569", // Used to prevent transaction reuse across blockchains. Auto-filled by MetaMask.
       };
+
+      // web3.eth.sendRawTransaction(transactionParameters).then(console.log);
       window.ethereum
         .request({
           method: "eth_sendTransaction",
-          params: [transactionParameters],
+          params: [txParams],
         })
         .then(console.log);
     },
     async verifyResponse(response) {
-      // const txHash = response.xhr.response;
-      const txHash = "0x01f3df6f342e68b0725a839b1e911749835d8cedd37e6c4e98de3ce54ee33d5c";
-
+      //const txHash = response.xhr.response;
+      const txHash =
+        "0xd4a74f48cfd477605b38ed3f67ac58417714dac91c5bb34c243777d7d353e426";
+      console.log(txHash);
       /* web3.js 조회 로직 구현*/
 
       web3.eth.getTransaction(txHash).then((data) => {
@@ -127,10 +141,8 @@ export default {
           this.isSuccessed = false;
           this.showModal();
         } else {
-          /*
-
-          */
-          this.isSuccessed = true;
+          console.log(data);
+          // 00. 트랜잭션 json을 txValues로 값만 추출한다.
           this.showModal();
         }
       });
