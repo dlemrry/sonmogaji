@@ -39,7 +39,7 @@
   </div>
 </template>
 <script>
-import { mapState, mapMutations, mapActions, mapGetters } from "vuex";
+import { mapState, mapMutations, mapActions } from "vuex";
 
 const userStore = "userStore";
 const apiStore = "apiStore";
@@ -49,7 +49,6 @@ export default {
   computed: {
     ...mapState(userStore, ["isLoggedIn", "account"]),
     ...mapState(apiStore, ["myTxList"]),
-    ...mapGetters(apiStore, ["getMyTxList"]),
   },
   created() {
     const info = {

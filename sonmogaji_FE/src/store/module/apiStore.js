@@ -9,6 +9,7 @@ const apiStore = {
     state: {
       // axios:{}
       myTxList :[],
+      txList : [],
     },
   
     getters: {
@@ -27,6 +28,9 @@ const apiStore = {
         // },
       MY_TX_All_LIST(state, myTx) {
         state.myTxList = myTx;
+      },
+      TX_All_LIST(state, tx) {
+        state.txList = tx;
       }
 
     },
@@ -34,8 +38,8 @@ const apiStore = {
     actions: {
       //axios api 요청들
 
-      // 나의 각서들 조회
-      readMyTxList ({ commit, state }, info) {
+      // 나의 각서 목록 조회
+      readMyTxList ({ commit }, info) {
         const params = {
           page: info.page
         }
@@ -47,7 +51,6 @@ const apiStore = {
           .then((res) => {
             console.log(res.data)
             commit('MY_TX_All_LIST', res.data)
-            console.log(state.myTxList)
             // commit('MY_FEED_All_LIST_COUNT', res.data.userBoardNum)
             // commit('MY_FEED_PAGINATION', res.data.userBoardNum)
           })
@@ -55,6 +58,27 @@ const apiStore = {
             console.log('에러')
             console.log(err)
           })
+      },
+      // 각서 목록 조회
+      readTxList({commit}, info) {
+        const params = {
+          page: info.page
+        }
+        instance({
+          url: API_BASE_URL + '/transaction/',
+          method: 'GET',
+          params
+        })
+        .then((res) => {
+          console.log(res.data)
+          commit('TX_All_LIST', res.data)
+          // commit('MY_FEED_All_LIST_COUNT', res.data.userBoardNum)
+          // commit('MY_FEED_PAGINATION', res.data.userBoardNum)
+        })
+        .catch((err) => {
+          console.log('에러')
+          console.log(err)
+        })
       },
       
       

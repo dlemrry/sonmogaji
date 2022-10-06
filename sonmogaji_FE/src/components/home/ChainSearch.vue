@@ -14,18 +14,21 @@
       </p>
     </div>
     <div ref="slider" class="keen-slider d-flex overflow-hidden">
-      <div class="keen-slider__slide" v-for="(item, index) in chainList" :key="item.hash">
-        <img class="item mx-5" :src="getImageSrc(index)" @click="showModal(item.hash)" />
+      <div class="keen-slider__slide" v-for="(item, index) in txList" :key="item.txAddress">
+        <img class="item mx-5" :src="getImageSrc(index)" @click="showModal(item)" />
       </div>
     </div>
-    <b-modal id="modal" ref="modal" :title="modalData.title" @hidden="hideModal()">
-      {{ modalData.hash }}
+    <b-modal id="modal" ref="modal" :title="modalData.txTitle" @hidden="hideModal()">
+      {{ modalData.txAddress }}
     </b-modal>
   </div>
 </template>
 
 <script>
 import KeenSlider from "keen-slider";
+import {mapState, mapActions} from "vuex";
+
+const apiStore = "apiStore";
 
 let gear = 0;
 let callback = null;
@@ -33,27 +36,39 @@ const animation = { duration: 10000, easing: (t) => t };
 
 export default {
   name: "ChainSearch",
+  computed: {
+      ...mapState(apiStore, ["txList"]),
+  },
+  created() {
+    const info = {page : 0}
+    this.readTxList(info);
+
+    this.chainList = this.txList;
+  },
   data() {
     return {
       modalData: {
-        hash: "",
-        title: "제목",
+        txAddress: "",
+        txTitle: "제목",
       },
-      chainList: [
-        { hash: "hash1" },
-        { hash: "hash2" },
-        { hash: "hash3" },
-        { hash: "hash4" },
-        { hash: "hash5" },
-        { hash: "hash6" },
-        { hash: "hash7" },
-        { hash: "hash8" },
-        { hash: "hash9" },
-      ],
+      chainList: null
+      // [
+      //   { hash: "hash1" },
+      //   { hash: "hash2" },
+      //   { hash: "hash3" },
+      //   { hash: "hash4" },
+      //   { hash: "hash5" },
+      //   { hash: "hash6" },
+      //   { hash: "hash7" },
+      //   { hash: "hash8" },
+      //   { hash: "hash9" },
+      // ]
+      ,
       images: ["item-cyan.png", "item-navy.png", "item-blue.png", "item-yellow.png"],
     };
   },
   methods: {
+    ...mapActions(apiStore, ['readTxList']),
     rotateList() {
       callback = setInterval(() => {
         const first = this.chainList.splice(0, 1);
@@ -69,13 +84,13 @@ export default {
     getImageSrc(index) {
       return require(`@/assets/icons/${this.images[(index + gear) % 4]}`);
     },
-    showModal(hash) {
+    showModal(tx) {
       this.slider.animator.stop();
       clearInterval(callback);
       // hash 값으로 모달에 띄울 데이터를 받아온다.
       this.$bvModal.show("modal");
-      this.modalData.hash = hash;
-      this.modalData.title = "^___^";
+      this.modalData.txAddress = tx.txAddress;
+      this.modalData.txTitle = tx.txTitle;
     },
     hideModal() {
       this.slider.emit("updated");
