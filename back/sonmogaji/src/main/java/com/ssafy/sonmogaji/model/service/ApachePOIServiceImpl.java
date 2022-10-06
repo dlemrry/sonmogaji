@@ -37,7 +37,11 @@ public class ApachePOIServiceImpl implements ApachePOIService{
 
     @Override
     public BufferedImage createPreview(TransactionDto transactionDto,String sessionId) throws Exception {
+<<<<<<< HEAD
         String sample = "src/main/resources/static/memorandom.docx";
+=======
+        String sample = "/src/main/resources/static/memorandom.docx";
+>>>>>>> c66a1d542694ca22cd8b2bbbc0f0d327fdb9e68f
         FileOutputStream fos = null;
 
 
