@@ -1,8 +1,12 @@
 package com.ssafy.sonmogaji.model.service;
 
 import com.amazonaws.services.s3.AmazonS3;
+import com.amazonaws.services.s3.AmazonS3Client;
+import com.amazonaws.services.s3.model.AmazonS3Exception;
+import com.amazonaws.services.s3.model.S3Object;
 import com.spire.doc.Document;
 import com.spire.doc.documents.ImageType;
+import com.ssafy.sonmogaji.exception.BadRequestException;
 import com.ssafy.sonmogaji.model.dto.TransactionDto;
 import com.ssafy.sonmogaji.util.Base64ToImgDecoder;
 import com.ssafy.sonmogaji.util.Steganographer;
@@ -11,6 +15,7 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.poi.util.Units;
 import org.apache.poi.xwpf.usermodel.*;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.core.io.Resource;
@@ -39,8 +44,10 @@ public class ApachePOIServiceImpl implements ApachePOIService{
     private final Base64ToImgDecoder base64ToImgDecoder;
     private final Steganographer steganographer;
 
-    private final AmazonS3 amazonS3;
+    private final AmazonS3Client amazonS3Client;
 
+//    @Value("classpath:/static/memorandom.docx")
+//    private Resource fileResource;
 
 
     @Override
@@ -48,14 +55,14 @@ public class ApachePOIServiceImpl implements ApachePOIService{
         String sample =  File.separator+ "memorandoms" +File.separator + "memorandom.docx";
         FileOutputStream fos = null;
 
-        InputStream inputStream = new ClassPathResource("static/memorandom.docx").getInputStream();
+//        InputStream inputStream = new ClassPathResource("static/memorandom.docx").getInputStream();
 
-        File file1 = File.createTempFile("resourceFile", ".docx");
-        try {
-            FileUtils.copyInputStreamToFile(inputStream, file1);
-        } finally {
-            IOUtils.closeQuietly(inputStream);
-        }
+//        File file1 = File.createTempFile("resourceFile", ".docx");
+//        try {
+//            FileUtils.copyInputStreamToFile(inputStream, file1);
+//        } finally {
+//            IOUtils.closeQuietly(inputStream);
+//        }
 
 
 //        ClassPathResource cpr = new ClassPathResource("memorandom.docx");
@@ -65,7 +72,6 @@ public class ApachePOIServiceImpl implements ApachePOIService{
 //        Resource resource = new InputStreamResource(getClass().getResourceAsStream(filePath.toString()));
 
 
-
         // 각서 원본 docx 파일 생성
         try {
             // 각서 샘플파일 복사하기
@@ -73,7 +79,7 @@ public class ApachePOIServiceImpl implements ApachePOIService{
 //            File file = new File(resource.getFilename());
             File newFile = new File( File.separator+ "memorandoms" +File.separator +sessionId+"memorandom_preview.docx");
 
-            Files.copy(file1.toPath(), newFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
+            Files.copy(file.toPath(), newFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
 
             XWPFDocument doc = new XWPFDocument(new FileInputStream(newFile));
             // 본문 입력하기
@@ -169,7 +175,7 @@ public class ApachePOIServiceImpl implements ApachePOIService{
                 }
 
             }
-            fos = new FileOutputStream(new File("memorandom_preview.docx"));
+            fos = new FileOutputStream(new File(File.separator+ "memorandoms" +File.separator +sessionId+"memorandom_preview.docx"));
             doc.write(fos);
 
             if(fos != null) fos.close();
@@ -182,11 +188,11 @@ public class ApachePOIServiceImpl implements ApachePOIService{
         File file = new File(File.separator+ "memorandoms" +File.separator +sessionId+"memorandom_preview.docx");
 
         Document document = new Document();
-        document.loadFromFile("memorandom_preview.docx");
+        document.loadFromFile(File.separator+ "memorandoms" +File.separator +sessionId+"memorandom_preview.docx");
 
         BufferedImage image = document.saveToImages(0, ImageType.Bitmap);
 
-        File imgFile = new File("Preview.PNG");
+        File imgFile = new File(File.separator+ "memorandoms" +File.separator +sessionId+"Preview.PNG");
         ImageIO.write(image, "PNG", imgFile);
         return image;
 
