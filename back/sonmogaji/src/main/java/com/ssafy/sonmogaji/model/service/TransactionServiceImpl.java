@@ -17,6 +17,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.ssafy.sonmogaji.model.dto.TransactionDto;
@@ -85,8 +86,12 @@ public class TransactionServiceImpl implements TransactionService {
 	// 유저 지갑 주소로 각서 목록 조회
 	@Override
 	public List<TransactionDto> readAllMyTransaction(String memberAddress, Pageable pageable) {
-		
-		Member member = memberRepository.findByMemberAddress(memberAddress).orElseGet(Member :: new);
+
+		System.out.println(memberAddress);
+//		Member member = memberRepository.findByMemberAddress(memberAddress).orElseGet(Member :: new);
+		Member member = memberRepository.findByMemberAddress(memberAddress).get();
+		System.out.println(member.getMemberAddress());
+
 		
 		List<TransactionDto> readTransactionDtos = new ArrayList<>();
 		List<Signee> signees = signeeRepository.findByMember(member);
