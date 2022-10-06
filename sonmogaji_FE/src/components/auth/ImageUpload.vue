@@ -130,9 +130,8 @@ export default {
         .then(console.log);
     },
     async verifyResponse(response) {
-      //const txHash = response.xhr.response;
-      const txHash =
-        "0xd4a74f48cfd477605b38ed3f67ac58417714dac91c5bb34c243777d7d353e426";
+      const txHash = response.xhr.response;
+      // const txHash =        "0xd4a74f48cfd477605b38ed3f67ac58417714dac91c5bb34c243777d7d353e426";
       console.log(txHash);
       /* web3.js 조회 로직 구현*/
 
