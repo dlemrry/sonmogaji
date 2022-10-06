@@ -44,7 +44,7 @@ public class ApachePOIServiceImpl implements ApachePOIService{
     private final Base64ToImgDecoder base64ToImgDecoder;
     private final Steganographer steganographer;
 
-    private final AmazonS3Client amazonS3Client;
+    private final AmazonS3 amazonS3;
 
 //    @Value("classpath:/static/memorandom.docx")
 //    private Resource fileResource;
