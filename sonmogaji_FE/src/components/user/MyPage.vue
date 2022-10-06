@@ -20,18 +20,18 @@
     <!--각서 목록-->
     <div class="row p-5">
       <b-card
-        v-for="item in myList"
-        :key="item.hash"
-        :title="item.title"
-        img-src="https://picsum.photos/400/300"
+        v-for="item in myTxList"
+        :key="item.txAddress"
+        :title="item.txTitle"
+        :img-src="item.imageUrl"
         img-alt="추억사진"
         img-top
         class="mx-2 my-4 col-6 col-md-4 col-lg-3"
       >
         <b-card-text>
           <ul>
-            <li>{{ item.timestamp }}</li>
-            <li>{{ item.hash }}</li>
+            <li>{{ item.txCreateDate }}</li>
+            <li>{{ item.txAddress }}</li>
           </ul>
         </b-card-text>
       </b-card>
@@ -39,14 +39,25 @@
   </div>
 </template>
 <script>
-import { mapState, mapMutations, mapActions } from "vuex";
+import { mapState, mapMutations, mapActions, mapGetters } from "vuex";
 
 const userStore = "userStore";
+const apiStore = "apiStore";
 
 export default {
   name: "MyPage",
   computed: {
     ...mapState(userStore, ["isLoggedIn", "account"]),
+    ...mapState(apiStore, ["myTxList"]),
+    ...mapGetters(apiStore, ["getMyTxList"]),
+  },
+  created() {
+    const info = {
+      userAddress : this.account,
+      page : 0
+    }
+    this.readMyTxList(info);
+    console.log(this.getMyTxList);
   },
   data() {
     return {
@@ -84,6 +95,12 @@ export default {
       ],
     };
   },
+  methods: {
+    ...mapActions(apiStore, ['readMyTxList', 'setTxAddress']),
+    goDetail(txAddress) {
+      this.setTxAddress(txAddress);
+    }
+  }
 };
 </script>
 <style scoped>
