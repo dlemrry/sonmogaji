@@ -16,6 +16,7 @@ const socketStore = {
     agree4: 0,
     agree5: 0,
     agree6: 0,
+    agree7: 0,
     sign: {},
     title: "",
     content: "",
@@ -85,6 +86,9 @@ const socketStore = {
     },
     getAgree5(state) {
       return state.agree5;
+    },
+    getAgree6(state) {
+      return state.agree6;
     },
     getSign(state) {
       return state.sign;
@@ -159,6 +163,9 @@ const socketStore = {
     },
     setAgree5(state, count) {
       state.agree5 = count;
+    },
+    setAgree6(state, count) {
+      state.agree6 = count;
     },
     setSign(state, sign) {
       state.sign = sign;
@@ -253,6 +260,15 @@ const socketStore = {
         }
       });
       commit("setAgree5", count);
+    },
+    changeAgree6({ commit, state }) {
+      let count = 0;
+      Object.entries(state.memorandumState.agree[5]).forEach(([key, value]) => {
+        if (value) {
+          count++;
+        }
+      });
+      commit("setAgree6", count);
     },
     changeSign({ commit, state }) {
       let signstate = [];
