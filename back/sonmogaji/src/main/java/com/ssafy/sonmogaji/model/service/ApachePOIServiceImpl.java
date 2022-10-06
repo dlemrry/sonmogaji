@@ -9,6 +9,8 @@ import com.ssafy.sonmogaji.util.Steganographer;
 import lombok.RequiredArgsConstructor;
 import org.apache.poi.util.Units;
 import org.apache.poi.xwpf.usermodel.*;
+import org.springframework.core.io.InputStreamResource;
+import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -17,6 +19,8 @@ import javax.xml.bind.DatatypeConverter;
 import java.awt.image.BufferedImage;
 import java.io.*;
 import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.Iterator;
 import java.util.List;
@@ -26,7 +30,7 @@ import java.util.StringTokenizer;
 @RequiredArgsConstructor
 public class ApachePOIServiceImpl implements ApachePOIService{
 
-//    private static final String PATH = "classpath:/static/";
+//    private static final String PATH = "classpath:static/";
 
     private final Base64ToImgDecoder base64ToImgDecoder;
     private final Steganographer steganographer;
@@ -37,15 +41,20 @@ public class ApachePOIServiceImpl implements ApachePOIService{
 
     @Override
     public BufferedImage createPreview(TransactionDto transactionDto,String sessionId) throws Exception {
-        String sample = "/static/memorandom.docx";
+//        String sample = "classpath:static" +File.separator + "memorandom.docx";
         FileOutputStream fos = null;
+
+        Path filePath = Paths.get(File.separatorChar+"static", File.separatorChar+"memorandom.docx");
+        Resource resource = new InputStreamResource(getClass().getResourceAsStream(filePath.toString()));
+
 
 
         // 각서 원본 docx 파일 생성
         try {
             // 각서 샘플파일 복사하기
-            File file = new File(sample);
-            File newFile = new File(sessionId+"memorandom_preview.docx");
+//            File file = new File(sample);
+            File file = new File(resource.getURI());
+            File newFile = new File( File.separatorChar+"static"+File.separatorChar+sessionId+"memorandom_preview.docx");
 
             Files.copy(file.toPath(), newFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
 
