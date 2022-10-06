@@ -24,7 +24,7 @@
       </div>
     </div>
     <b-modal id="modal" ref="modal" :title="modalData.title" @hidden="hideModal()">
-      <div v-if="modalData.isSuccessed">
+      <div v-if="modalData.isSuccessed == true">
         <div>
           <img src="@/assets/icons/success.png" />
         </div>
@@ -55,7 +55,7 @@ import "vue2-dropzone/dist/vue2Dropzone.min.css";
 import { getMemoryImage } from "@/api/index.js";
 
 const Web3 = require("web3");
-const rpcURL = "http://j7a3081.p.ssafy.io:8545";
+const rpcURL = "https://j7a3081.p.ssafy.io";
 const web3 = new Web3(rpcURL);
 const userStore = "userStore";
 
@@ -69,7 +69,8 @@ const fake = {
   txIsSecret: "false",
   txCreateDate: "null",
   txExpDate: "null",
-  signees: "omg",
+  txNftUrl: "null",
+  signees: "abc",
 };
 
 export default {
