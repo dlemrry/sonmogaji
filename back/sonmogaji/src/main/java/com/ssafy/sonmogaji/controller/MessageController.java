@@ -77,6 +77,7 @@ public class MessageController {
             agreelist.get(3).put(headerAccessor.getSessionId(),false);
             agreelist.get(4).put(headerAccessor.getSessionId(),false);
             agreelist.get(5).put(headerAccessor.getSessionId(),false);
+            agreelist.get(6).put(headerAccessor.getSessionId(),false);
 
             r.getMemorandumState().getSign().put(headerAccessor.getSessionId(), "");
             r.getMemorandumState().getSignState().put(message.getSenderNickName(),false);
