@@ -55,7 +55,7 @@ export default {
     return {};
   },
   methods: {
-    ...mapActions(["sendRequirePreview"]),
+    ...mapActions(["sendRequirePreview","roomNext","roomVote"]),
     toMain7() {
       this.roomNext(7);
     },

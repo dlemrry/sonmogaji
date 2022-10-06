@@ -28,6 +28,8 @@ const socketStore = {
       agree: [],
       sign: [],
     },
+    memorandumFinal:{},
+    memorandumFinalImage:"",
   },
   getters: {
     getRoomCode(state) {
@@ -93,6 +95,12 @@ const socketStore = {
     getMemorandumState(state) {
       return state.memorandumState;
     },
+    getMemorandumFinal(state){
+      return state.memorandumFinal
+    },
+    getMemorandumFinalImage(state){
+      return state.memorandumFinalImage
+    }
   },
   mutations: {
     setRoomCode(state, roomCode) {
@@ -183,6 +191,12 @@ const socketStore = {
       state.memorySecret = "A";
       state.memorandumState = { agree: [], sign: [] };
       state.memorandumPreview = "";
+    },
+    setMemorandumFinal(state, memorandumFinal) {
+      state.memorandumFinal = memorandumFinal;
+    },
+    setMemorandumFinalImage(state, memorandumFinalImage) {
+      state.memorandumFinalImage = memorandumFinalImage;
     },
   },
   actions: {
@@ -386,6 +400,17 @@ const socketStore = {
         })
       );
     },
+    sendTxHash({ commit, state },txhash){
+      state.stomp.send(
+        "/pub/memorandum/txhash",
+        {},
+        JSON.stringify({
+          roomCode:state.roomCode,
+          txHash: txhash,
+        })
+      );
+    },
+
     stompConnect({ commit, state, dispatch }) {
       // const serverURL = "https://j7a308.p.ssafy.io/room";
       const serverURL = "/room";
@@ -538,6 +563,8 @@ const socketStore = {
             var content = JSON.parse(res.body);
             if (content.message == "ok") {
               commit("setMemorandumPreview", "data:image/png;base64,"+ content.preview);
+              commit("setMemorandumFinal",content.tdto);
+              console.log(content.tdto)
             } else {
               console.log(content.message);
             }
@@ -546,10 +573,24 @@ const socketStore = {
             //commit("receiveChatmessages", { sender: content.sender, message: content.message });
           });
 
+          state.stomp.subscribe("/sub/memorandum/txhash/" + state.roomCode, (res) => {
+            var content = JSON.parse(res.body);
+            if (content.message == "ok") {
+              //완성된 각서이미지 받아옴
+              commit("setMemorandumFinalImage","data:image/png;base64,"+content.memorandumFinal)
+            } else {
+              console.log(content.message);
+            }
+
+           });
+
           state.stomp.subscribe("/sub/chat/message/" + state.roomCode, (res) => {
             var content = JSON.parse(res.body);
             commit("receiveChatmessages", { sender: content.sender, message: content.message });
           });
+          
+
+          
           state.stomp.send(
             "/pub/memorandum/join",
             {},

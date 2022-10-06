@@ -144,6 +144,11 @@ const routes = [
         name: "sessionMain6",
         component: () => import("../components/session/sessionmain6/SessionMain6.vue"),
       },
+      {
+        path: "sessionMain7",
+        name: "sessionMain7",
+        component: () => import("../components/session/sessionmain7/SessionMain7.vue"),
+      },
     ],
   },
 ];
