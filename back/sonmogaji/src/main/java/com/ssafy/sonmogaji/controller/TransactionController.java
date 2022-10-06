@@ -10,12 +10,7 @@ import org.springframework.data.domain.Sort.Direction;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestPart;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.ssafy.sonmogaji.model.dto.TransactionDto;
@@ -28,6 +23,7 @@ import lombok.RequiredArgsConstructor;
 @RestController
 @RequestMapping("/api/transaction")
 @RequiredArgsConstructor
+@CrossOrigin(origins = "*")
 public class TransactionController {
 
     private final TransactionService transactionService;
@@ -99,7 +95,14 @@ public class TransactionController {
     @GetMapping("/myTx/{walletAddress}")
     public ResponseEntity<?> readAllMyTransactions(@PageableDefault(size = 10, sort = "txCreateDate", direction = Direction.DESC) Pageable pageable, @PathVariable String walletAddress) throws Exception {
         try {
-            return new ResponseEntity<List<TransactionDto>>(transactionService.readAllMyTransaction(walletAddress, pageable), HttpStatus.OK);
+
+            List<TransactionDto> transactionDtos = transactionService.readAllMyTransaction(walletAddress, pageable);
+
+            if(transactionDtos != null) {
+                return new ResponseEntity<List<TransactionDto>>(transactionDtos, HttpStatus.OK);
+            } else {
+                return new ResponseEntity<Void>(HttpStatus.NO_CONTENT);
+            }
         } catch (Exception e) {
             return exceptionHandling(e);
         }

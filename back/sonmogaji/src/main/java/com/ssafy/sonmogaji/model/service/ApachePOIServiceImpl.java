@@ -1,5 +1,6 @@
 package com.ssafy.sonmogaji.model.service;
 
+import com.amazonaws.services.s3.AmazonS3;
 import com.spire.doc.Document;
 import com.spire.doc.documents.ImageType;
 import com.ssafy.sonmogaji.model.dto.TransactionDto;
@@ -19,6 +20,7 @@ import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
 import java.util.Iterator;
 import java.util.List;
+import java.util.StringTokenizer;
 
 @Service
 @RequiredArgsConstructor
@@ -29,12 +31,15 @@ public class ApachePOIServiceImpl implements ApachePOIService{
     private final Base64ToImgDecoder base64ToImgDecoder;
     private final Steganographer steganographer;
 
+    private final AmazonS3 amazonS3;
+
 
 
     @Override
     public BufferedImage createPreview(TransactionDto transactionDto,String sessionId) throws Exception {
         String sample = "memorandom.docx";
         FileOutputStream fos = null;
+
 
         // 각서 원본 docx 파일 생성
         try {
@@ -52,15 +57,40 @@ public class ApachePOIServiceImpl implements ApachePOIService{
                     for(XWPFRun r : runs) {
                         String text = r.getText(0);
                         if(text != null && text.contains("제목")) {
-                            text = text.concat(transactionDto.getTxTitle());
+                            text = text.replace("제목", transactionDto.getTxTitle());
+//                            text = text.concat(transactionDto.getTxTitle());
                             r.setText(text, 0);
                         }
                         if(text != null && text.contains("내용")) {
-                            text = text.concat(transactionDto.getTxContent());
+
+                            StringTokenizer st = new StringTokenizer(transactionDto.getTxContent());
+                            StringBuilder sb = new StringBuilder();
+
+                            while(st.hasMoreElements()) {
+                                sb.append(st.nextToken()).append("\n");
+                            }
+
+                            text = text.replace("내용", sb);
+
+
+//                            text = text.replace("내용", transactionDto.getTxContent());
+//                            text = text.concat(transactionDto.getTxContent());
                             r.setText(text, 0);
                         }
+
+                        if(text != null && text.contains("만료일")) {
+
+                            if(transactionDto.getTxExpDate() == null) {
+                                text = text.replace("만료일", "만료일: " + "무기한");
+                            } else {
+                                text = text.replace("만료일", "만료일: " + transactionDto.getTxExpDate().toString());
+                            }
+                            r.setText(text, 0);
+                        }
+
                         if(text != null && text.contains("날짜")) {
-                            text = text.concat(transactionDto.getTxCreateDate().toString());
+                            text = text.replace("날짜", transactionDto.getTxCreateDate().toString());
+//                            text = text.concat(transactionDto.getTxCreateDate().toString());
                             r.setText(text, 0);
                         }
                     }
@@ -86,8 +116,6 @@ public class ApachePOIServiceImpl implements ApachePOIService{
 
             for(int i = 0; i < transactionDto.getSignees().size(); i++ ) {
                 XWPFTableRow row = table.getRow(i);
-//                row.getCell(0).setText(transactionDto.getSignees().get(i).getMemberAddress());
-
                 row.getCell(0).setText(transactionDto.getSignees().get(i).getSigneeName());
 
                 // 사인 이미지 넣기
