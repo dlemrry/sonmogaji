@@ -7,6 +7,8 @@ import com.ssafy.sonmogaji.model.dto.TransactionDto;
 import com.ssafy.sonmogaji.util.Base64ToImgDecoder;
 import com.ssafy.sonmogaji.util.Steganographer;
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
 import org.apache.poi.util.Units;
 import org.apache.poi.xwpf.usermodel.*;
 import org.springframework.core.io.ClassPathResource;
@@ -46,6 +48,15 @@ public class ApachePOIServiceImpl implements ApachePOIService{
         String sample =  File.separator+ "memorandoms" +File.separator + "memorandom.docx";
         FileOutputStream fos = null;
 
+        InputStream inputStream = new ClassPathResource("static/memorandom.docx").getInputStream();
+
+        File file1 = File.createTempFile("resourceFile", ".docx");
+        try {
+            FileUtils.copyInputStreamToFile(inputStream, file1);
+        } finally {
+            IOUtils.closeQuietly(inputStream);
+        }
+
 
 //        ClassPathResource cpr = new ClassPathResource("memorandom.docx");
 //        byte[] bdata = FileCopyUtils.copyToByteArray(cpr.getInputStream());
@@ -62,7 +73,7 @@ public class ApachePOIServiceImpl implements ApachePOIService{
 //            File file = new File(resource.getFilename());
             File newFile = new File( File.separator+ "memorandoms" +File.separator +sessionId+"memorandom_preview.docx");
 
-            Files.copy(file.toPath(), newFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
+            Files.copy(file1.toPath(), newFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
 
             XWPFDocument doc = new XWPFDocument(new FileInputStream(newFile));
             // 본문 입력하기
@@ -168,7 +179,7 @@ public class ApachePOIServiceImpl implements ApachePOIService{
         }
 
         // 각서 이미지로 변환하기
-        File file = new File("memorandom_preview.docx");
+        File file = new File(File.separator+ "memorandoms" +File.separator +sessionId+"memorandom_preview.docx");
 
         Document document = new Document();
         document.loadFromFile("memorandom_preview.docx");
