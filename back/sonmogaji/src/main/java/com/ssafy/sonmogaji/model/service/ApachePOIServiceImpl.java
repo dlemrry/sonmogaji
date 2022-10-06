@@ -43,7 +43,7 @@ public class ApachePOIServiceImpl implements ApachePOIService{
 
     @Override
     public BufferedImage createPreview(TransactionDto transactionDto,String sessionId) throws Exception {
-        String sample =  "static" +File.separator + "memorandom.docx";
+        String sample =  File.separator+ "memorandoms" +File.separator + "memorandom.docx";
         FileOutputStream fos = null;
 
 
@@ -60,7 +60,7 @@ public class ApachePOIServiceImpl implements ApachePOIService{
             // 각서 샘플파일 복사하기
             File file = new File(sample);
 //            File file = new File(resource.getFilename());
-            File newFile = new File( "static" +File.separator +sessionId+"memorandom_preview.docx");
+            File newFile = new File( File.separator+ "memorandoms" +File.separator +sessionId+"memorandom_preview.docx");
 
             Files.copy(file.toPath(), newFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
 
