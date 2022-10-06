@@ -71,6 +71,9 @@ public class ApachePOIServiceImpl implements ApachePOIService{
 //        Path filePath = Paths.get(File.separatorChar+"static", File.separatorChar+"memorandom.docx");
 //        Resource resource = new InputStreamResource(getClass().getResourceAsStream(filePath.toString()));
 
+        Path filePath = Paths.get(File.separator+ "memorandoms" +File.separator + "memorandom.docx");
+        Path newFilePath = Paths.get(File.separator+ "memorandoms" +File.separator +sessionId+"memorandom_preview.docx");
+
 
         // 각서 원본 docx 파일 생성
         try {
@@ -79,7 +82,9 @@ public class ApachePOIServiceImpl implements ApachePOIService{
 //            File file = new File(resource.getFilename());
             File newFile = new File( File.separator+ "memorandoms" +File.separator +sessionId+"memorandom_preview.docx");
 
-            Files.copy(file.toPath(), newFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
+            Files.copy(filePath, newFilePath, StandardCopyOption.REPLACE_EXISTING);
+
+//            Files.copy(file.toPath(), newFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
 
             XWPFDocument doc = new XWPFDocument(new FileInputStream(newFile));
             // 본문 입력하기
