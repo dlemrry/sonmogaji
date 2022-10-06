@@ -1,10 +1,9 @@
-// import Stomp from "webstomp-client";
 import Stomp from "stompjs";
 import SockJS from "sockjs-client";
 import routes from "../../router/index.js";
 const socketStore = {
   state: {
-    ishost: false,
+    isHost: false,
     roomCode: "",
     senderNickName: "",
     roll: "",
@@ -16,20 +15,20 @@ const socketStore = {
     agree3: 0,
     agree4: 0,
     agree5: 0,
-    sign: [],
+    agree6: 0,
+    sign: {},
     title: "",
     content: "",
     secret: "A",
     expire: "",
     memoryImage: "",
-    memorySecret: true,
+    memorySecret: "A",
+    memorandumPreview: "",
     memorandumState: {
       agree: [],
-
       sign: [],
     },
   },
-
   getters: {
     getRoomCode(state) {
       return state.roomCode;
@@ -85,15 +84,16 @@ const socketStore = {
     getAgree5(state) {
       return state.agree5;
     },
-
     getSign(state) {
       return state.sign;
+    },
+    getMemorandumPreview(state) {
+      return state.memorandumPreview;
     },
     getMemorandumState(state) {
       return state.memorandumState;
     },
   },
-
   mutations: {
     setRoomCode(state, roomCode) {
       state.roomCode = roomCode;
@@ -125,7 +125,6 @@ const socketStore = {
     setMemorySecret(state, memorySecret) {
       state.memorySecret = memorySecret;
     },
-
     setStomp(state, stomp) {
       state.stomp = stomp;
     },
@@ -159,8 +158,33 @@ const socketStore = {
     setMemorandumState(state, memorandumstate) {
       state.memorandumState = memorandumstate;
     },
+    setMemorandumPreview(state, memorandumPreview) {
+      state.memorandumPreview = memorandumPreview;
+    },
+    clearState(state) {
+      state.roomCode = "";
+      state.senderNickName = "";
+      state.roll = "";
+      state.socket = "";
+      state.stomp = "";
+      state.chatmessages = "";
+      state.agree1 = 0;
+      state.agree2 = 0;
+      state.agree3 = 0;
+      state.agree4 = 0;
+      state.agree5 = 0;
+      state.agree6 = 0;
+      state.sign = {};
+      state.title = "";
+      state.content = "";
+      state.secret = "A";
+      state.expire = "";
+      state.memoryImage = "";
+      state.memorySecret = "A";
+      state.memorandumState = { agree: [], sign: [] };
+      state.memorandumPreview = "";
+    },
   },
-
   actions: {
     enterNickName({ commit, state }, senderNickName) {
       commit("setSenderNickName", senderNickName);
@@ -227,10 +251,8 @@ const socketStore = {
           signstate.push(t);
         }
       });
-
       commit("setSign", signstate);
     },
-
     roomStart({ commit, state }) {
       state.stomp.send(
         "/pub/memorandum/start",
@@ -301,7 +323,6 @@ const socketStore = {
       if (state.secret == "B") {
         secret = false;
       }
-
       state.stomp.send(
         "/pub/memorandum/secret",
         {},
@@ -311,12 +332,21 @@ const socketStore = {
         })
       );
     },
+    sendMemoryImage({ commit, state }) {
+      state.stomp.send(
+        "/pub/memorandum/memoryimage",
+        {},
+        JSON.stringify({
+          memoryImage: state.memoryImage,
+          roomCode: state.roomCode,
+        })
+      );
+    },
     sendMemorySecret({ commit, state }) {
       let MemorySecret = true;
       if (state.memorySecret == "B") {
         MemorySecret = false;
       }
-
       state.stomp.send(
         "/pub/memorandum/memorysecret",
         {},
@@ -327,8 +357,6 @@ const socketStore = {
       );
     },
     sendDate({ commit, state }) {
-      
-
       state.stomp.send(
         "/pub/memorandum/expire",
         {},
@@ -338,51 +366,62 @@ const socketStore = {
         })
       );
     },
-
+    sendSign({ commit, state }, sign) {
+      state.stomp.send(
+        "/pub/memorandum/sign",
+        {},
+        JSON.stringify({
+          sign: sign,
+          roomCode: state.roomCode,
+          senderNickName: state.senderNickName,
+        })
+      );
+    },
+    sendRequirePreview({ commit, state }) {
+      state.stomp.send(
+        "/pub/memorandum/preview",
+        {},
+        JSON.stringify({
+          roomCode: state.roomCode,
+        })
+      );
+    },
     stompConnect({ commit, state, dispatch }) {
       // const serverURL = "https://j7a308.p.ssafy.io/room";
       const serverURL = "/room";
       commit("setSocket", new SockJS(serverURL));
       console.log(state.socket);
       console.log("param nick : " + state.senderNickName);
-
       commit("setStomp", Stomp.over(state.socket));
       console.log(state.stomp);
       state.stomp.connect(
         {},
         () => {
           state.stomp.connected = true;
-
           commit("setStomp", state.stomp);
           commit("setChatmessages", [{}, {}]);
           console.log(state.chatmessages);
           console.log("소켓 연결 성공" + state.senderNickName + " " + state.roomCode);
-          state.stomp.send(
-            "/pub/memorandum/join",
-            {},
-            JSON.stringify({
-              roomCode: state.roomCode,
-              senderNickName: state.senderNickName,
-            })
-          );
 
           state.stomp.subscribe("/sub/memorandum/join/" + state.roomCode, (res) => {
             var content = JSON.parse(res.body);
             console.log(content);
             if (content.message != "ok") {
               dispatch("stompDisconnect");
+              
               // this.stompDisconnect();
             }
+            commit("setSign", content.signState);
+              console.log(state.sign)
           });
           state.stomp.subscribe("/sub/memorandum/start/" + state.roomCode, (res) => {
             var content = JSON.parse(res.body);
             console.log(content);
-
             if (content.message == "start") {
               commit("setMemorandumState", content.memorandumState);
+              commit("setSign",content.signState)
               dispatch("changeAgree1");
-              dispatch("changeSign");
-
+              // dispatch("changeSign");
               routes.push({ name: "sessionMain1" });
             } else {
               console.log(content.message);
@@ -393,23 +432,27 @@ const socketStore = {
             if (content.message == "1") {
               commit("setMemorandumState", content.memorandumState);
               dispatch("changeAgree1");
-              dispatch("changeSign");
+              // dispatch("changeSign");
             } else if (content.message == "2") {
               commit("setMemorandumState", content.memorandumState);
               dispatch("changeAgree2");
-              dispatch("changeSign");
+              // dispatch("changeSign");
             } else if (content.message == "3") {
               commit("setMemorandumState", content.memorandumState);
               dispatch("changeAgree3");
-              dispatch("changeSign");
+              // dispatch("changeSign");
             } else if (content.message == "4") {
               commit("setMemorandumState", content.memorandumState);
               dispatch("changeAgree4");
-              dispatch("changeSign");
+              // dispatch("changeSign");
             } else if (content.message == "5") {
               commit("setMemorandumState", content.memorandumState);
               dispatch("changeAgree5");
-              dispatch("changeSign");
+              // dispatch("changeSign");
+            } else if (content.message == "6") {
+              commit("setMemorandumState", content.memorandumState);
+              dispatch("changeAgree6");
+              // dispatch("changeSign");
             } else {
               console.log(content.message);
             }
@@ -426,11 +469,12 @@ const socketStore = {
               routes.push({ name: "sessionMain5" });
             } else if (content.message == "6") {
               routes.push({ name: "sessionMain6" });
+            } else if (content.message == "7") {
+              routes.push({ name: "sessionMain7" });
             } else {
               console.log(content.message);
             }
           });
-
           state.stomp.subscribe("/sub/memorandum/content/" + state.roomCode, (res) => {
             var content = JSON.parse(res.body);
             commit("setTitle", content.title);
@@ -446,41 +490,74 @@ const socketStore = {
               } else {
                 commit("setSecret", "B");
               }
+            } else {
+              console.log(content.message);
             }
-            else{
-              console.log(content.message)
+          });
+          state.stomp.subscribe("/sub/memorandum/memoryimage/" + state.roomCode, (res) => {
+            var content = JSON.parse(res.body);
+            if (content.message == "ok") {
+              commit("setMemoryImage", content.memoryImage);
+            } else {
+              console.log(content.message);
             }
+            //commit("setMemorandumState",content.memorandumState)
+            //commit("receiveChatmessages", { sender: content.sender, message: content.message });
           });
           state.stomp.subscribe("/sub/memorandum/expire/" + state.roomCode, (res) => {
             var content = JSON.parse(res.body);
-            if(content.message=="ok"){
-              console.log(content.memorandumState.expire)
-              commit("setExpire",content.memorandumState.expire)
+            if (content.message == "ok") {
+              console.log(content.memorandumState.expire);
+              commit("setExpire", content.memorandumState.expire);
+            } else {
+              console.log(content.message);
             }
-            else{
-              console.log(content.message)
-            }
-            
           });
           state.stomp.subscribe("/sub/memorandum/memorysecret/" + state.roomCode, (res) => {
             var content = JSON.parse(res.body);
             if (content.message == "ok") {
-              if (content.memorandumState.memorySecret) {
+              if (content.memorySecret) {
                 commit("setMemorySecret", "A");
               } else {
                 commit("setMemorySecret", "B");
               }
+            } else {
+              console.log(content.message);
             }
-            else{
-              console.log(content.message)
+          });
+          state.stomp.subscribe("/sub/memorandum/sign/" + state.roomCode, (res) => {
+            var content = JSON.parse(res.body);
+            if (content.message == "ok") {
+              console.log(content.signState);
+              commit("setSign", content.signState);
+            } else {
+              console.log(content.message);
             }
+          });
+          state.stomp.subscribe("/sub/memorandum/preview/" + state.roomCode, (res) => {
+            var content = JSON.parse(res.body);
+            if (content.message == "ok") {
+              commit("setMemorandumPreview", "data:image/png;base64,"+ content.preview);
+            } else {
+              console.log(content.message);
+            }
+
+            //commit("setMemorandumState",content.memorandumState)
+            //commit("receiveChatmessages", { sender: content.sender, message: content.message });
           });
 
           state.stomp.subscribe("/sub/chat/message/" + state.roomCode, (res) => {
             var content = JSON.parse(res.body);
-
             commit("receiveChatmessages", { sender: content.sender, message: content.message });
           });
+          state.stomp.send(
+            "/pub/memorandum/join",
+            {},
+            JSON.stringify({
+              roomCode: state.roomCode,
+              senderNickName: state.senderNickName,
+            })
+          );
         },
         (error) => {
           // 소켓 연결 실패
@@ -496,5 +573,4 @@ const socketStore = {
     },
   },
 };
-
 export default socketStore;

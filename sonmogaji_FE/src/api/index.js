@@ -1,9 +1,17 @@
-import axios from "axios";
-const api = axios.create();
+import axios from 'axios'
+// import store from '@/store/index.js'
 
-async function getMemoryImage(txHash, success, fail) {
-  await api.get(`/api/transaction/${txHash}/img`).then(success).catch(fail);
-  return;
-}
+export const instance = axios.create(
+)
 
-export { getMemoryImage };
+instance.interceptors.request.use(
+  (config) => {
+    // config.headers.Authorization = store.state.accessToken
+    // config.headers.Authorization = `Bearer ${localStorage.getItem('accessToken')}`
+    config.headers.Authorization = localStorage.getItem('accessToken')
+    return config
+  },
+  (error) => {
+    return Promise.reject(error)
+  }
+)

@@ -1,30 +1,38 @@
 <template>
-  <b-container>
-    <b-row>
-      <b-col>별명을 입력하세요!</b-col> <b-col>{{ this.status }}</b-col></b-row
-    >
-    <b-row>
-      <input v-model="nicknameinput" id="nickname" type="text" />
-    </b-row>
-    <b-row>
-      <b-button @click="create()">방만들기</b-button>
+<div id="enterNickname" >
+  <b-container >
+    <b-row align-h="center"> <b-col id="nicknameLabel">별명을 입력하세요!</b-col> </b-row>
+    <br/>
+    <b-row align-h="center"
+      ><b-col id="nicknameStatus">{{ this.status }}</b-col></b-row
+    ><br/>
+    <b-row align-h="center">
+      <b-col id="nicknameInput"
+        ><input v-model="nicknameinput" id="nickname" type="text"
+      /></b-col> </b-row
+    ><br/>
+    <b-row align-h="center">
+      <b-col id="nicknameButton"> <b-button @click="create()">방만들기</b-button></b-col>
     </b-row>
   </b-container>
+</div>
 </template>
 
 <script>
 import { mapState, mapActions, mapGetters, mapMutations } from "vuex";
 import axios from "axios";
 export default {
-  name: "cnterNickname",
+  name: "enterNickname",
   components: {},
   computed: {
     ...mapState(["senderNickName"]),
     ...mapGetters(["getSenderNickName"]),
   },
-  created() {},
+  created() {
+    this.clearState();
+  },
   mounted() {
-    console.log("cnterNickname");
+    console.log("enterNickname");
   },
   data() {
     return {
@@ -33,8 +41,8 @@ export default {
     };
   },
   methods: {
-    ...mapActions(["enterNickName","enterRoomCode","enterRoll"]),
-    ...mapMutations(["setIsHost"]),
+    ...mapActions(["enterNickName", "enterRoomCode", "enterRoll"]),
+    ...mapMutations(["setIsHost", "clearState"]),
     create() {
       if (this.nicknameinput != "") {
         this.enterNickName(this.nicknameinput);
@@ -42,18 +50,17 @@ export default {
           .post("/api/room/create", {
             senderNickName: this.getSenderNickName,
           })
-          .then( (response)=> {
+          .then((response) => {
             this.enterRoll("signee");
             console.log(response.data.roomCode);
             this.enterRoomCode(response.data.roomCode);
             this.setIsHost(true);
             this.$router.push({ name: "session" });
           })
-          .catch( (error) =>{
+          .catch((error) => {
             console.log(error);
           })
-          .finally( () =>{
-          });
+          .finally(() => {});
       } else {
         this.status = "별명을 확인해주세요";
       }
@@ -61,3 +68,21 @@ export default {
   },
 };
 </script>
+<style scoped>
+#enterNickname{
+  padding: 20vh 0;
+  height: 70vh;
+}
+#nicknameLabel {
+  text-align: center;
+}
+#nicknameStatus {color:red;
+  text-align: center;
+}
+#nicknameInput {
+  text-align: center;
+}
+#nicknameButton {
+  text-align: center;
+}
+</style>
