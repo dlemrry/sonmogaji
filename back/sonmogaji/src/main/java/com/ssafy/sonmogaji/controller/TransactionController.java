@@ -49,7 +49,7 @@ public class TransactionController {
     @PostMapping("/createPreview")
     public ResponseEntity<?> createPreview(@RequestPart TransactionDto transactionDto) throws Exception {
         try {
-            apachePOIService.createPreview(transactionDto);
+            apachePOIService.createPreview(transactionDto,"");
             return new ResponseEntity<String>("파일 생성!", HttpStatus.OK);
         } catch (Exception e) {
             return exceptionHandling(e);

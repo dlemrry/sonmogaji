@@ -1,5 +1,6 @@
 package com.ssafy.sonmogaji.controller;
 
+import com.fasterxml.jackson.databind.ser.Serializers;
 import com.ssafy.sonmogaji.model.dto.SigneeDto;
 import com.ssafy.sonmogaji.model.dto.TransactionDto;
 import com.ssafy.sonmogaji.model.entity.room.*;
@@ -8,6 +9,7 @@ import com.ssafy.sonmogaji.model.service.Base64ToFile;
 import com.ssafy.sonmogaji.model.service.TransactionServiceImpl;
 import lombok.*;
 import lombok.extern.log4j.Log4j2;
+import org.apache.commons.io.FileUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.event.EventListener;
 import org.springframework.messaging.handler.annotation.MessageMapping;
@@ -20,13 +22,13 @@ import org.springframework.web.socket.messaging.SessionDisconnectEvent;
 import org.web3j.abi.datatypes.Bool;
 import org.web3j.crypto.Hash;
 
+import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
+import java.io.ByteArrayInputStream;
+import java.io.File;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Controller
 @RequiredArgsConstructor
@@ -79,6 +81,7 @@ public class MessageController {
             r.getMemorandumState().getSign().put(headerAccessor.getSessionId(), "");
             r.getMemorandumState().getSignState().put(message.getSenderNickName(),false);
             message.setRoomCode(message.getRoomCode());
+            message.setSignState(r.getMemorandumState().getSignState());
 //            message.setMemorandumState(r.getMemorandumState());
             message.setMessage("ok");
             template.convertAndSend("/sub/memorandum/join/" + message.getRoomCode(), message);
@@ -347,13 +350,15 @@ public class MessageController {
                 //dto 생성 끝
 
 
-            BufferedImage bimage= apachePOIService.createPreview(tdto);
+            BufferedImage bimage= apachePOIService.createPreview(tdto,headerAccessor.getSessionId());
             //각서 이미지 생성끝
 
             //각서 이미지 base64로 다시 변환
             String b64img=Base64ToFile.encodeToString(bimage,"png");
+            r.getMemorandumState().setMemorandumPreview(b64img);
             message.setMessage("ok");
             message.setPreview(b64img);
+            message.setTdto(tdto);
 
             template.convertAndSend("/sub/memorandum/preview/" + message.getRoomCode(), message);
         } else {
@@ -362,6 +367,35 @@ public class MessageController {
         }
     }
 
+    @MessageMapping(value = "/memorandum/txhash")
+    // headerAccessor는 소켓서버의 주인ID를 확인하기 위해서 사용
+    public void txhash(txFormat message, SimpMessageHeaderAccessor headerAccessor) throws Exception {
+
+        Room r = roomList.findRoomByRoomCode(message.getRoomCode());
+//        MemorandumState mstate=r.getMemorandumState();
+        if (r.getHostSessionId().equals(headerAccessor.getSessionId())) {
+
+            String preview = r.getMemorandumState().getMemorandumPreview();
+
+            MultipartFile mf = new Base64ToFile(preview , "data:image/png;");
+
+
+            String filename=apachePOIService.createImg(mf,message.getTxHash());
+
+            log.info(filename);
+            //mf 를 다시 base64로
+            File steganofied = new File(filename);
+            byte[] fileContent = FileUtils.readFileToByteArray(steganofied);
+            String encodedString = Base64.getEncoder().encodeToString(fileContent);
+            message.setMessage("ok");
+            message.setMemorandumFinal(encodedString);
+
+            template.convertAndSend("/sub/memorandum/txhash/" + message.getRoomCode(), message);
+        } else {
+            message.setMessage("you are not host");
+            template.convertAndSendToUser(headerAccessor.getSessionId(), "/sub/memorandum/txhash/" + message.getRoomCode(), message);
+        }
+    }
     @MessageMapping("/chat/message")
     public void message(chatFormat message, SimpMessageHeaderAccessor headerAccessor) {
         Room r = roomList.findRoomByRoomCode(message.getRoomCode());
@@ -421,6 +455,7 @@ class joinFormat {
     private String message;
     private String senderNickName;
     private String roomCode;
+    private Map<String,Boolean> signState;
 }
 
 @Getter
@@ -432,4 +467,17 @@ class  previewFormat {
     private String preview;
     private String senderNickName;
     private String roomCode;
+    private TransactionDto tdto;
+}
+@Getter
+@Setter
+@AllArgsConstructor
+@NoArgsConstructor
+class  txFormat {
+    private String message;
+    private String senderNickName;
+    private String txHash;
+    private String roomCode;
+    private TransactionDto tdto;
+    private String memorandumFinal;
 }

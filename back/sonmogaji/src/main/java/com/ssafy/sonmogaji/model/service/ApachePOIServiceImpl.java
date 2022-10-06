@@ -32,7 +32,7 @@ public class ApachePOIServiceImpl implements ApachePOIService{
 
 
     @Override
-    public BufferedImage createPreview(TransactionDto transactionDto) throws Exception {
+    public BufferedImage createPreview(TransactionDto transactionDto,String sessionId) throws Exception {
         String sample = "memorandom.docx";
         FileOutputStream fos = null;
 
@@ -40,7 +40,7 @@ public class ApachePOIServiceImpl implements ApachePOIService{
         try {
             // 각서 샘플파일 복사하기
             File file = new File(sample);
-            File newFile = new File("memorandom_preview.docx");
+            File newFile = new File(sessionId+"memorandom_preview.docx");
 
             Files.copy(file.toPath(), newFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
 
@@ -139,12 +139,12 @@ public class ApachePOIServiceImpl implements ApachePOIService{
     }
 
     @Override
-    public File createImg(MultipartFile file, String transactionAddress) throws IOException {
+    public String createImg(MultipartFile file, String transactionAddress) throws IOException {
 
         File preview = new File(file.getOriginalFilename());
         file.transferTo(preview);
-        steganographer.encode(preview, transactionAddress);
+        String str=steganographer.encode(preview, transactionAddress);
 
-        return null;
+        return str;
     }
 }

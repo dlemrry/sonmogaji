@@ -20,6 +20,8 @@ public class MemorandumState {
     private boolean memorySecret;
     private HashMap<String,String> sign;
     private HashMap<String,Boolean> signState;
+
+    private String memorandumPreview; //프리뷰 이미지
 //
     public MemorandumState(){
         Map<String, Boolean> map = new HashMap<String, Boolean>();
@@ -42,6 +44,7 @@ public class MemorandumState {
         this.memorySecret = false;
         this.sign = new HashMap<String,String>();
         this.signState=new HashMap<>();
+        this.memorandumPreview="";
 
     }
 

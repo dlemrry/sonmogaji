@@ -49,13 +49,14 @@ public class Steganographer {
 
 	// Encode
 
-	public void encode(File file, String textPath) {
+	public String encode(File file, String textPath) {
 		BufferedImage originalImage = getImageFromFile(file);
 		BufferedImage imageInUserSpace = getImageInUserSpace(originalImage);
-		String text = getTextFromTextFile(textPath);
+//		String text = getTextFromTextFile(textPath);
 
 		byte imageInBytes[] = getBytesFromImage(imageInUserSpace);
-		byte textInBytes[] = text.getBytes();
+//		byte textInBytes[] = text.getBytes();
+		byte textInBytes[] = textPath.getBytes();
 		byte textLengthInBytes[] = getBytesFromInt(textInBytes.length);
 		try {
 			encodeImage(imageInBytes, textLengthInBytes,  0); 
@@ -63,7 +64,7 @@ public class Steganographer {
 		}
 		catch (Exception exception) {
 			System.out.println("Couldn't hide text in image. Error: " + exception);
-			return;
+			return null;
 		}
 
 		String fileName = file.getName();
@@ -75,7 +76,7 @@ public class Steganographer {
 		String finalFileName = fileName + "_with_hidden_message.png";
 		System.out.println("Successfully encoded text in: " + finalFileName);
 		saveImageToPath(imageInUserSpace, new File(finalFileName),"png");
-		return;
+		return finalFileName;
 	}
 
 	public static byte[] encodeImage(byte[] image, byte[] addition, int offset) {
