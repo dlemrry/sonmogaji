@@ -53,7 +53,7 @@ public class ApachePOIServiceImpl implements ApachePOIService{
         try {
             // 각서 샘플파일 복사하기
 //            File file = new File(sample);
-            File file = new File(resource.getURI());
+            File file = new File(resource.getFilename());
             File newFile = new File( File.separatorChar+"static"+File.separatorChar+sessionId+"memorandom_preview.docx");
 
             Files.copy(file.toPath(), newFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
