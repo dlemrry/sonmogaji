@@ -38,13 +38,15 @@ public class ApachePOIServiceImpl implements ApachePOIService{
     @Override
     public BufferedImage createPreview(TransactionDto transactionDto,String sessionId) throws Exception {
         String sample = "src/main/resources/static/memorandom.docx";
+        String sample2 = String.valueOf(amazonS3.getUrl("sonmogaji", "memorandom"));
+
         FileOutputStream fos = null;
 
 
         // 각서 원본 docx 파일 생성
         try {
             // 각서 샘플파일 복사하기
-            File file = new File(sample);
+            File file = new File(sample2);
             File newFile = new File(sessionId+"memorandom_preview.docx");
 
             Files.copy(file.toPath(), newFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
