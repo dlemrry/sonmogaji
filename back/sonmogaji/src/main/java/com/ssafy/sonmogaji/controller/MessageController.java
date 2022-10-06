@@ -276,7 +276,8 @@ public class MessageController {
 
 //            SimpleDateFormat dformat = new SimpleDateFormat("yyyy-MM-dd");
 //            r.getMemorandumState().setExpire(dformat.parse(message.getExpire()));
-            log.info(message.getExpire());
+
+            r.getMemorandumState().setExpire(message.getExpire());
             message.setMessage("ok");
             message.setMemorandumState(r.getMemorandumState());
             template.convertAndSend("/sub/memorandum/expire/" + message.getRoomCode(), message);
