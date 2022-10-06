@@ -1,5 +1,6 @@
 package com.ssafy.sonmogaji.model.service;
 
+import com.amazonaws.services.s3.AmazonS3;
 import com.spire.doc.Document;
 import com.spire.doc.documents.ImageType;
 import com.ssafy.sonmogaji.model.dto.TransactionDto;
@@ -19,6 +20,7 @@ import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
 import java.util.Iterator;
 import java.util.List;
+import java.util.StringTokenizer;
 
 @Service
 @RequiredArgsConstructor
@@ -29,12 +31,15 @@ public class ApachePOIServiceImpl implements ApachePOIService{
     private final Base64ToImgDecoder base64ToImgDecoder;
     private final Steganographer steganographer;
 
+    private final AmazonS3 amazonS3;
+
 
 
     @Override
     public BufferedImage createPreview(TransactionDto transactionDto) throws Exception {
-        String sample = "memorandom.docx";
+        String sample = "src/main/resources/static/memorandom.docx";
         FileOutputStream fos = null;
+
 
         // 각서 원본 docx 파일 생성
         try {
@@ -57,7 +62,18 @@ public class ApachePOIServiceImpl implements ApachePOIService{
                             r.setText(text, 0);
                         }
                         if(text != null && text.contains("내용")) {
-                            text = text.replace("내용", transactionDto.getTxContent());
+
+                            StringTokenizer st = new StringTokenizer(transactionDto.getTxContent());
+                            StringBuilder sb = new StringBuilder();
+
+                            while(st.hasMoreElements()) {
+                                sb.append(st.nextToken()).append("\n");
+                            }
+
+                            text = text.replace("내용", sb);
+
+
+//                            text = text.replace("내용", transactionDto.getTxContent());
 //                            text = text.concat(transactionDto.getTxContent());
                             r.setText(text, 0);
                         }

@@ -23,12 +23,12 @@ public class Signee {
 	private Long signeeID;
 
 	// 사인한 멤버
-	@ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
+	@ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
 	@JoinColumn(name = "member_address")
 	private Member member;
 	
 	// 사인한 각서
-	@ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
+	@ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
 	@JoinColumn(name = "tx_address")
 	private Transaction transaction;
 	
