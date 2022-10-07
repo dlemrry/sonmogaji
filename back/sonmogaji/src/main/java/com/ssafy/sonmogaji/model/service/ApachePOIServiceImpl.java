@@ -71,12 +71,12 @@ public class ApachePOIServiceImpl implements ApachePOIService{
                 if(runs != null) {
                     for(XWPFRun r : runs) {
                         String text = r.getText(0);
-                        if(text != null && text.contains("제목")) {
-                            text = text.replace("제목", transactionDto.getTxTitle());
+                        if(text != null && text.contains("제목:")) {
+                            text = text.replace("제목:", transactionDto.getTxTitle());
 //                            text = text.concat(transactionDto.getTxTitle());
                             r.setText(text, 0);
                         }
-                        if(text != null && text.contains("내용")) {
+                        if(text != null && text.contains("내용:")) {
 
                             StringTokenizer st = new StringTokenizer(transactionDto.getTxContent());
                             StringBuilder sb = new StringBuilder();
@@ -85,7 +85,7 @@ public class ApachePOIServiceImpl implements ApachePOIService{
                                 sb.append(st.nextToken()).append("\n");
                             }
 
-                            text = text.replace("내용", sb);
+                            text = text.replace("내용:", sb);
 
 
 //                            text = text.replace("내용", transactionDto.getTxContent());
@@ -93,12 +93,12 @@ public class ApachePOIServiceImpl implements ApachePOIService{
                             r.setText(text, 0);
                         }
 
-                        if(text != null && text.contains("만료일")) {
+                        if(text != null && text.contains("만료일:")) {
 
                             if(transactionDto.getTxExpDate() == null) {
-                                text = text.replace("만료일", "만료일: " + "무기한");
+                                text = text.replace("만료일:", "만료일: " + "무기한");
                             } else {
-                                text = text.replace("만료일", "만료일: " + transactionDto.getTxExpDate().toString());
+                                text = text.replace("만료일:", "만료일: " + transactionDto.getTxExpDate().toString());
                             }
                             r.setText(text, 0);
                         }
