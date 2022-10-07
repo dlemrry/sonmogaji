@@ -10,7 +10,7 @@
 
 ## 2. 주요 기능
 
-![image.png](./image.png)
+![image.png](./readme/image.png)
 
 <br/>
 
@@ -42,7 +42,7 @@
 
 ### 아키텍쳐
 
-![image-1.png](./image-1.png)
+![image-1.png](./readme/image-1.png)
 
 <br/>
 
