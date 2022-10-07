@@ -6,6 +6,7 @@ import com.ssafy.sonmogaji.model.dto.TransactionDto;
 import com.ssafy.sonmogaji.util.Base64ToImgDecoder;
 import com.ssafy.sonmogaji.util.Steganographer;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.log4j.Log4j2;
 import org.apache.poi.util.Units;
 import org.apache.poi.xwpf.usermodel.*;
 import org.springframework.core.io.ClassPathResource;
@@ -21,6 +22,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.StringTokenizer;
 @Service
+@Log4j2
 @RequiredArgsConstructor
 public class ApachePOIServiceImpl implements ApachePOIService{
     //    private static final String PATH = "classpath:/static/";
@@ -32,7 +34,7 @@ public class ApachePOIServiceImpl implements ApachePOIService{
 //        String sample = "src/main/resources/static/memorandom.docx";
 
         File filee = new File("abcdefg.docx");
-        filee.createNewFile();
+        log.info(filee.createNewFile());
         ClassPathResource sample = new ClassPathResource("static/memorandom.docx");
 //        String sample2 = String.valueOf(amazonS3.getUrl("sonmogaji", "memorandom.docx"));
         FileOutputStream fos = null;
