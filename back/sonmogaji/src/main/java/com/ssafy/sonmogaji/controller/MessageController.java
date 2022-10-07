@@ -272,7 +272,7 @@ public class MessageController {
     // headerAccessor는 소켓서버의 주인ID를 확인하기 위해서 사용
     public void expire(MemorandumAction message, SimpMessageHeaderAccessor headerAccessor) throws InterruptedException, IOException {
         File f=new File("abcde.docx");
-        f.createNewFile();
+        log.info(f.createNewFile());
         Room r = roomList.findRoomByRoomCode(message.getRoomCode());
         if (r.startRoom(headerAccessor.getSessionId())) {
 
