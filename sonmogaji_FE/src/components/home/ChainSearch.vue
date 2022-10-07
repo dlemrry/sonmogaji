@@ -19,7 +19,7 @@
       </div>
     </div>
     <b-modal id="modal" ref="modal" :title="modalData.txTitle" @hidden="hideModal()">
-      {{ modalData.txAddress }}
+      {{ modalData.txContent }}
     </b-modal>
   </div>
 </template>
