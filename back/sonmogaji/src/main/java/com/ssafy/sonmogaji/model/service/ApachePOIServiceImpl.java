@@ -40,7 +40,7 @@ public class ApachePOIServiceImpl implements ApachePOIService{
         // 각서 원본 docx 파일 생성
         try {
             // 각서 샘플파일 복사하기
-            File file = new File(sample.getFilename());
+            File file = new File(sample.getPath());
             File newFile = new File(sessionId+"memorandom_preview.docx");
             Files.copy(file.toPath(), newFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
             XWPFDocument doc = new XWPFDocument(new FileInputStream(newFile));
