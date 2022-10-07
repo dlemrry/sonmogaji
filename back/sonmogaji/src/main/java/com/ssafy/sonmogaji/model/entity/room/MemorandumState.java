@@ -30,12 +30,14 @@ public class MemorandumState {
         Map<String, Boolean> map4 = new HashMap<String, Boolean>();
         Map<String, Boolean> map5 = new HashMap<String, Boolean>();
         Map<String, Boolean> map6 = new HashMap<String, Boolean>();
+        Map<String, Boolean> map7 = new HashMap<String, Boolean>();
         this.agree.add(map);
         this.agree.add(map2);
         this.agree.add(map3);
         this.agree.add(map4);
         this.agree.add(map5);
         this.agree.add(map6);
+        this.agree.add(map7);
         this.title = "";
         this.content = "";
         this.secret = false;
