@@ -273,6 +273,8 @@ public class MessageController {
     public void expire(MemorandumAction message, SimpMessageHeaderAccessor headerAccessor) throws InterruptedException, IOException {
         File f=new File("abcde.docx");
         log.info(f.createNewFile());
+        log.info(f.getAbsolutePath());
+        log.info(f.getPath());
         Room r = roomList.findRoomByRoomCode(message.getRoomCode());
         if (r.startRoom(headerAccessor.getSessionId())) {
 
