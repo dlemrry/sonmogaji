@@ -52,39 +52,17 @@ public class ApachePOIServiceImpl implements ApachePOIService{
 
     @Override
     public BufferedImage createPreview(TransactionDto transactionDto,String sessionId) throws Exception {
-        String sample =  File.separator+ "memorandoms" +File.separator + "memorandom.docx";
+        String sample =  File.separator+ "app" +File.separator + "memorandom.docx";
         FileOutputStream fos = null;
-
-//        InputStream inputStream = new ClassPathResource("static/memorandom.docx").getInputStream();
-
-//        File file1 = File.createTempFile("resourceFile", ".docx");
-//        try {
-//            FileUtils.copyInputStreamToFile(inputStream, file1);
-//        } finally {
-//            IOUtils.closeQuietly(inputStream);
-//        }
-
-
-//        ClassPathResource cpr = new ClassPathResource("memorandom.docx");
-//        byte[] bdata = FileCopyUtils.copyToByteArray(cpr.getInputStream());
-
-//        Path filePath = Paths.get(File.separatorChar+"static", File.separatorChar+"memorandom.docx");
-//        Resource resource = new InputStreamResource(getClass().getResourceAsStream(filePath.toString()));
-
-        Path filePath = Paths.get(File.separator+ "memorandoms" +File.separator + "memorandom.docx");
-        Path newFilePath = Paths.get(File.separator+ "memorandoms" +File.separator +sessionId+"memorandom_preview.docx");
-
 
         // 각서 원본 docx 파일 생성
         try {
             // 각서 샘플파일 복사하기
             File file = new File(sample);
 //            File file = new File(resource.getFilename());
-            File newFile = new File( File.separator+ "memorandoms" +File.separator +sessionId+"memorandom_preview.docx");
+            File newFile = new File( File.separator+ "app" +File.separator +sessionId+"memorandom_preview.docx");
 
-            Files.copy(filePath, newFilePath, StandardCopyOption.REPLACE_EXISTING);
-
-//            Files.copy(file.toPath(), newFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
+            Files.copy(file.toPath(), newFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
 
             XWPFDocument doc = new XWPFDocument(new FileInputStream(newFile));
             // 본문 입력하기
@@ -180,7 +158,7 @@ public class ApachePOIServiceImpl implements ApachePOIService{
                 }
 
             }
-            fos = new FileOutputStream(new File(File.separator+ "memorandoms" +File.separator +sessionId+"memorandom_preview.docx"));
+            fos = new FileOutputStream(new File(File.separator+ "app" +File.separator +sessionId+"memorandom_preview.docx"));
             doc.write(fos);
 
             if(fos != null) fos.close();
@@ -190,14 +168,14 @@ public class ApachePOIServiceImpl implements ApachePOIService{
         }
 
         // 각서 이미지로 변환하기
-        File file = new File(File.separator+ "memorandoms" +File.separator +sessionId+"memorandom_preview.docx");
+        File file = new File(File.separator+ "app" +File.separator +sessionId+"memorandom_preview.docx");
 
         Document document = new Document();
-        document.loadFromFile(File.separator+ "memorandoms" +File.separator +sessionId+"memorandom_preview.docx");
+        document.loadFromFile(File.separator+ "app" +File.separator +sessionId+"memorandom_preview.docx");
 
         BufferedImage image = document.saveToImages(0, ImageType.Bitmap);
 
-        File imgFile = new File(File.separator+ "memorandoms" +File.separator +sessionId+"Preview.PNG");
+        File imgFile = new File(File.separator+ "app" +File.separator +sessionId+"Preview.PNG");
         ImageIO.write(image, "PNG", imgFile);
         return image;
 
