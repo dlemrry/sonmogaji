@@ -1,94 +1,45 @@
 package com.ssafy.sonmogaji.model.service;
-
 import com.amazonaws.services.s3.AmazonS3;
-import com.amazonaws.services.s3.AmazonS3Client;
-import com.amazonaws.services.s3.model.AmazonS3Exception;
-import com.amazonaws.services.s3.model.S3Object;
 import com.spire.doc.Document;
 import com.spire.doc.documents.ImageType;
-import com.ssafy.sonmogaji.exception.BadRequestException;
 import com.ssafy.sonmogaji.model.dto.TransactionDto;
 import com.ssafy.sonmogaji.util.Base64ToImgDecoder;
 import com.ssafy.sonmogaji.util.Steganographer;
 import lombok.RequiredArgsConstructor;
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.IOUtils;
 import org.apache.poi.util.Units;
 import org.apache.poi.xwpf.usermodel.*;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ClassPathResource;
-import org.springframework.core.io.InputStreamResource;
-import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
-import org.springframework.util.FileCopyUtils;
 import org.springframework.web.multipart.MultipartFile;
-
 import javax.imageio.ImageIO;
 import javax.xml.bind.DatatypeConverter;
 import java.awt.image.BufferedImage;
 import java.io.*;
 import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.Iterator;
 import java.util.List;
 import java.util.StringTokenizer;
-
 @Service
 @RequiredArgsConstructor
 public class ApachePOIServiceImpl implements ApachePOIService{
-
-//    private static final String PATH = "classpath:static/";
-
+    //    private static final String PATH = "classpath:/static/";
     private final Base64ToImgDecoder base64ToImgDecoder;
     private final Steganographer steganographer;
-
     private final AmazonS3 amazonS3;
-
-//    @Value("classpath:/static/memorandom.docx")
-//    private Resource fileResource;
-
-
     @Override
     public BufferedImage createPreview(TransactionDto transactionDto,String sessionId) throws Exception {
-//        String sample =  File.separator+ "memorandoms" +File.separator + "memorandom.docx";
+//        String sample = "src/main/resources/static/memorandom.docx";
+
         ClassPathResource sample = new ClassPathResource("static/memorandom.docx");
-//        String sample =  File.separator+ "static" +File.separator + "memorandom.docx";
+//        String sample2 = String.valueOf(amazonS3.getUrl("sonmogaji", "memorandom.docx"));
         FileOutputStream fos = null;
-
-//        InputStream inputStream = new ClassPathResource("static/memorandom.docx").getInputStream();
-
-//        File file1 = File.createTempFile("resourceFile", ".docx");
-//        try {
-//            FileUtils.copyInputStreamToFile(inputStream, file1);
-//        } finally {
-//            IOUtils.closeQuietly(inputStream);
-//        }
-
-
-//        ClassPathResource cpr = new ClassPathResource("memorandom.docx");
-//        byte[] bdata = FileCopyUtils.copyToByteArray(cpr.getInputStream());
-
-//        Path filePath = Paths.get(File.separatorChar+"static", File.separatorChar+"memorandom.docx");
-//        Resource resource = new InputStreamResource(getClass().getResourceAsStream(filePath.toString()));
-
-        Path filePath = Paths.get(File.separator+ "memorandoms" +File.separator + "memorandom.docx");
-        Path newFilePath = Paths.get(File.separator+ "memorandoms" +File.separator +sessionId+"memorandom_preview.docx");
-
-
         // 각서 원본 docx 파일 생성
         try {
             // 각서 샘플파일 복사하기
             File file = new File(sample.getFilename());
-//            File file = new File(resource.getFilename());
-//            File newFile = new File( File.separator+ "memorandoms" +File.separator +sessionId+"memorandom_preview.docx");
-            File newFile = new File( File.separator+ "static" +File.separator +sessionId+"memorandom_preview.docx");
-
-            Files.copy(filePath, newFilePath, StandardCopyOption.REPLACE_EXISTING);
-
-//            Files.copy(file.toPath(), newFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
-
+            File newFile = new File(sessionId+"memorandom_preview.docx");
+            Files.copy(file.toPath(), newFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
             XWPFDocument doc = new XWPFDocument(new FileInputStream(newFile));
             // 본문 입력하기
             for(XWPFParagraph p : doc.getParagraphs()) {
@@ -102,24 +53,17 @@ public class ApachePOIServiceImpl implements ApachePOIService{
                             r.setText(text, 0);
                         }
                         if(text != null && text.contains("내용")) {
-
                             StringTokenizer st = new StringTokenizer(transactionDto.getTxContent());
                             StringBuilder sb = new StringBuilder();
-
                             while(st.hasMoreElements()) {
                                 sb.append(st.nextToken()).append("\n");
                             }
-
                             text = text.replace("내용", sb);
-
-
 //                            text = text.replace("내용", transactionDto.getTxContent());
 //                            text = text.concat(transactionDto.getTxContent());
                             r.setText(text, 0);
                         }
-
                         if(text != null && text.contains("만료일")) {
-
                             if(transactionDto.getTxExpDate() == null) {
                                 text = text.replace("만료일", "만료일: " + "무기한");
                             } else {
@@ -127,7 +71,6 @@ public class ApachePOIServiceImpl implements ApachePOIService{
                             }
                             r.setText(text, 0);
                         }
-
                         if(text != null && text.contains("날짜")) {
                             text = text.replace("날짜", transactionDto.getTxCreateDate().toString());
 //                            text = text.concat(transactionDto.getTxCreateDate().toString());
@@ -136,83 +79,59 @@ public class ApachePOIServiceImpl implements ApachePOIService{
                     }
                 }
             }
-
             XWPFTable table = null;
             // 테이블 요소 구하기
             Iterator<IBodyElement> docElementsIterator = doc.getBodyElementsIterator();
             while(docElementsIterator.hasNext()) {
                 IBodyElement docElement = docElementsIterator.next();
-
                 if("TABLE".equalsIgnoreCase(docElement.getElementType().name())) {
                     List<XWPFTable> xwpfTableList = docElement.getBody().getTables();
-
                     table = xwpfTableList.get(0);
                 }
             }
-
             for(int i = 0; i<transactionDto.getSignees().size() -2 ; i++) {
                 table.createRow();
             }
-
             for(int i = 0; i < transactionDto.getSignees().size(); i++ ) {
                 XWPFTableRow row = table.getRow(i);
                 row.getCell(0).setText(transactionDto.getSignees().get(i).getSigneeName());
-
                 // 사인 이미지 넣기
                 String data = transactionDto.getSignees().get(i).getSignBase64().split(",")[1];
                 byte[] imgBytes = DatatypeConverter.parseBase64Binary(data);
                 BufferedImage bufImg = ImageIO.read(new ByteArrayInputStream(imgBytes));
-
                 InputStream is = new ByteArrayInputStream(imgBytes);
-
-
-
                 int imgType = XWPFDocument.PICTURE_TYPE_PNG;
                 String imgFileName = transactionDto.getSignees().get(i).getSigneeName();
                 int width = 100;
                 int height = 50;
-
                 XWPFParagraph paragraph = doc.createParagraph();
                 XWPFRun run = paragraph.createRun();
                 run.addPicture(is, imgType, imgFileName,Units.toEMU(width), Units.toEMU(height));
-
                 row.getCell(1).setParagraph(paragraph);
-
                 if(paragraph != null) {
                     doc.removeBodyElement(doc.getPosOfParagraph(paragraph));
                 }
-
             }
-            fos = new FileOutputStream(new File(File.separator+ "memorandoms" +File.separator +sessionId+"memorandom_preview.docx"));
+            fos = new FileOutputStream(new File("memorandom_preview.docx"));
             doc.write(fos);
-
             if(fos != null) fos.close();
-
         } catch (Exception e) {
             e.printStackTrace();
         }
-
         // 각서 이미지로 변환하기
-        File file = new File(File.separator+ "memorandoms" +File.separator +sessionId+"memorandom_preview.docx");
-
+        File file = new File("memorandom_preview.docx");
         Document document = new Document();
-        document.loadFromFile(File.separator+ "memorandoms" +File.separator +sessionId+"memorandom_preview.docx");
-
+        document.loadFromFile("memorandom_preview.docx");
         BufferedImage image = document.saveToImages(0, ImageType.Bitmap);
-
-        File imgFile = new File(File.separator+ "memorandoms" +File.separator +sessionId+"Preview.PNG");
+        File imgFile = new File("Preview.PNG");
         ImageIO.write(image, "PNG", imgFile);
         return image;
-
     }
-
     @Override
     public String createImg(MultipartFile file, String transactionAddress) throws IOException {
-
         File preview = new File(file.getOriginalFilename());
         file.transferTo(preview);
         String str=steganographer.encode(preview, transactionAddress);
-
         return str;
     }
 }
