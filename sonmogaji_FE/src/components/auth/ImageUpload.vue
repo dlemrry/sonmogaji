@@ -25,25 +25,42 @@
     </div>
     <b-modal id="modal" ref="modal" :title="modalData.title" @hidden="hideModal()">
       <div v-if="modalData.isSuccessed == true">
-        <div>
+        <div class="text-center mb-4">
           <img src="@/assets/icons/success.png" />
         </div>
-        <div>
+        <div
+          class="w-75 mx-auto mb-2 bg-cyan rounded text-white text-center text-lg"
+          style="font-family: 'Prentdard' sans-serif"
+        >
           해당 각서는 <b>블록체인</b>에 보관된, <br />
           꼭 지켜져야 할 <b>약속</b>이 맞습니다.
         </div>
         <div>
-          <img :src="modalData.imageFile" alt="" />
+          <img :src="modalData.imageFile" alt="" class="w-100" />
         </div>
         <div>
-          {{ modalData.createDate }}
-          {{ modalData.hash }}
+          <ul>
+            <li><b>블록체인 : </b>{{ modalData.blockchain }}</li>
+            <li><b>해시 : </b>{{ modalData.hash }}</li>
+            <li><b>생성일 : </b>{{ modalData.createDate }}</li>
+          </ul>
         </div>
       </div>
       <div v-else>
-        <div>
+        <div class="text-center mb-4">
           <img src="@/assets/icons/fail.png" />
         </div>
+        <div
+          class="w-75 mx-auto mb-2 rounded text-white text-center text-lg"
+          style="background-color: #777777"
+        >
+          이 각서에 대해 아는 바가 없습니다.
+        </div>
+        <ul>
+          <li>메신저, 이메일을 거쳐 <span style="color: #f16b51">변형</span>된 경우</li>
+          <li>누군가 고의로 내용을 <span style="color: #f16b51">조작</span>한 경우</li>
+          <li>손모가지에서 다운로드한 각서가 아닌 경우</li>
+        </ul>
       </div>
     </b-modal>
   </div>
@@ -100,11 +117,12 @@ export default {
     };
   },
   methods: {
+    truncate(str, maxlength) {
+      return str.length > maxlength ? str.slice(0, maxlength - 1) + "…" : str;
+    },
     showModal(hash) {
       // hash 값으로 모달에 띄울 데이터를 받아온다.
       this.$bvModal.show("modal");
-      this.modalData.hash = hash;
-      this.modalData.title = "^___^";
     },
     hideModal() {
       // this.rotateList();
@@ -115,7 +133,7 @@ export default {
       // 0x341d3b71824ad7bed85d6a810853a810f3b05ac0df8c5a943a8ad9ba4743b0b4
       // 0xd8530ba190785a01b1747162cb35ae3b47239fb5a21056a1c7f6be2952492baa
       // 0x249a3c526602c32553a46fc1955ddba11ca4919feb0e8d956e8eb97712581862
-      const txHash = response.xhr.response;
+      var txHash = response.xhr.response;
 
       // 01. 해시값으로 블록체인 네트워크에서 해당 트랜잭션을 가져온다.
       web3.eth
@@ -124,33 +142,25 @@ export default {
           // 02. 만약 온 데이터가 없다면, 해당 해시에 대한 트랜잭션이 없는 것으로, false 화면을 출력한다.
           if (data == null) {
             this.modalData.isSuccessed = false;
+            this.modalData.title = "인증 실패";
             this.showModal();
           }
           // 03. 만약 온 데이터가 있다면 파싱해서 modal에 들어갈 데이터를 채운다.
           else {
             const decodedData = web3.eth.abi.decodeParameters(["string"], data.input)[0];
             const parsedData = decodedData.split(" ");
+            this.modalData.title = "인증 성공";
             this.modalData.isSuccessed = true;
-            // getMemoryImage(
-            //   txHash,
-            //   (response) => {
-            //     console.log(response);
-            //     this.modalData.imageFile = require(`${response.data.base64Str}`);
-            //   },
-            //   (error) => {
-            //     console.log(error);
-            //     this.modalData.imageFile = "";
-            //   },
-            // );
             this.modalData.imageFile = parsedData[3];
             this.modalData.createDate = parsedData[6];
-            this.modalData.hash = txHash;
+            this.modalData.hash = this.truncate(txHash, 30);
             this.showModal();
           }
         })
         // 04. 만약 에러가 발생했다면, 해당 해시에 대한 트랜잭션이 없는 것으로, false 화면을 출력한다.
         .catch((error) => {
           this.modalData.isSuccessed = false;
+          this.modalData.title = "인증 실패";
           this.showModal();
         });
     },

@@ -1,21 +1,29 @@
 <template>
-<div id="enterNickname" >
-  <b-container >
-    <b-row align-h="center"> <b-col id="nicknameLabel">별명을 입력하세요!</b-col> </b-row>
-    <br/>
-    <b-row align-h="center"
-      ><b-col id="nicknameStatus">{{ this.status }}</b-col></b-row
-    ><br/>
-    <b-row align-h="center">
-      <b-col id="nicknameInput"
-        ><input v-model="nicknameinput" id="nickname" type="text"
-      /></b-col> </b-row
-    ><br/>
-    <b-row align-h="center">
-      <b-col id="nicknameButton"> <b-button @click="create()">방만들기</b-button></b-col>
-    </b-row>
-  </b-container>
-</div>
+  <div id="enterNickname">
+    <b-container>
+      <b-row align-h="center">
+        <b-col id="nicknameLabel"><p class="h2">별명을 입력하세요!</p></b-col>
+      </b-row>
+      <br />
+      <b-row align-h="center"
+        ><b-col id="nicknameStatus">{{ this.status }}</b-col></b-row
+      ><br />
+      <b-row align-h="center">
+        <b-col id="nicknameInput"
+          ><input v-model="nicknameinput" id="nickname" type="text"
+        /></b-col> </b-row
+      ><br />
+      <b-row align-h="center">
+        <b-col id="nicknameButton">
+          <b-button
+            @click="create()"
+            style="background-color: #223359; border: 0px; font-size: 20px"
+            >방만들기</b-button
+          ></b-col
+        >
+      </b-row>
+    </b-container>
+  </div>
 </template>
 
 <script>
@@ -69,17 +77,26 @@ export default {
 };
 </script>
 <style scoped>
-#enterNickname{
+#enterNickname {
   padding: 20vh 0;
   height: 70vh;
 }
 #nicknameLabel {
   text-align: center;
 }
-#nicknameStatus {color:red;
+#nicknameStatus {
+  color: red;
   text-align: center;
 }
 #nicknameInput {
+  text-align: center;
+}
+#nickname {
+  border-left-width: 0;
+  border-right-width: 0;
+  border-top-width: 0;
+  border-bottom-width: 1;
+  font-size: 24px;
   text-align: center;
 }
 #nicknameButton {

@@ -19,7 +19,9 @@
   src: url("@/assets/fonts/Pretendard-ExtraBold.ttf") format("truetype");
   font-weight: 800;
 }
-
+* {
+  font-family: "Pretendard", sans-serif !important;
+}
 /* 앱 기본 설정 */
 #app {
   font-family: "Pretendard", sans-serif !important;

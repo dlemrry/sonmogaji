@@ -2,28 +2,33 @@
   <b-container>
     <main id="app">
       <section ref="chatArea" class="chat-area">
-        <ul     v-for="(message, index) in this.getChatmessages"  :key="index"  >
-          <li v-if="message.sender===getSenderNickName" class="message message-out"> 
+        <ul v-for="(message, index) in this.getChatmessages" :key="index">
+          <li v-if="message.sender === getSenderNickName" class="message message-out">
             {{ message.message }}
           </li>
-          <li v-else class="message message-in"> 
+          <li v-else class="message message-in">
             {{ message.message }}
           </li>
-          
         </ul>
       </section>
 
       <section class="chat-inputs">
-        <form @submit.prevent="sendMessage()" id="person2-form">
+        <form @submit.prevent="sendMessage()" id="person2-form" class="shaodow-lg">
           <b-row>
             <b-col cols="9"
               ><input
                 v-model="chatinput"
                 id="person2-input"
                 type="text"
-                placeholder="Type your message"
+                placeholder="채팅을 입력하세요!"
+                style="border: 0px; background-color: #f5f5f5"
             /></b-col>
-            <b-col cols="3"><button type="submit">Send</button></b-col>
+            <b-col cols="3"
+              ><b-button
+                type="submit"
+                style="background-color: #223359; border: 0px; font-size: 20px"
+                ><b-icon class="send"></b-icon></b-button
+            ></b-col>
           </b-row>
         </form>
       </section>
@@ -40,12 +45,10 @@ export default {
     ...mapState(["chatmessages", "stomp", "roomId", "nickname"]),
     ...mapGetters(["getChatmessages", "getSenderNickName"]),
   },
-  created() {
-    
-  },
+  created() {},
   mounted() {
     console.log("sessionChat");
-    console.log(this.getSenderNickName)
+    console.log(this.getSenderNickName);
   },
   props: {},
   data() {
@@ -57,7 +60,7 @@ export default {
     ...mapActions(["chat"]),
     sendMessage() {
       this.chat(this.chatinput);
-      this.chatinput=""
+      this.chatinput = "";
     },
   },
 };
