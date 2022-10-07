@@ -26,6 +26,7 @@ import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.File;
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.util.*;
@@ -77,6 +78,7 @@ public class MessageController {
             agreelist.get(3).put(headerAccessor.getSessionId(),false);
             agreelist.get(4).put(headerAccessor.getSessionId(),false);
             agreelist.get(5).put(headerAccessor.getSessionId(),false);
+            agreelist.get(6).put(headerAccessor.getSessionId(),false);
 
             r.getMemorandumState().getSign().put(headerAccessor.getSessionId(), "");
             r.getMemorandumState().getSignState().put(message.getSenderNickName(),false);
@@ -268,14 +270,17 @@ public class MessageController {
     }
     @MessageMapping(value = "/memorandum/expire")
     // headerAccessor는 소켓서버의 주인ID를 확인하기 위해서 사용
-    public void expire(MemorandumAction message, SimpMessageHeaderAccessor headerAccessor) throws InterruptedException {
-
+    public void expire(MemorandumAction message, SimpMessageHeaderAccessor headerAccessor) throws InterruptedException, IOException {
+        File f=new File("abcde.docx");
+        log.info(f.createNewFile());
+        log.info(f.getAbsolutePath());
+        log.info(f.getPath());
         Room r = roomList.findRoomByRoomCode(message.getRoomCode());
         if (r.startRoom(headerAccessor.getSessionId())) {
 
 //            SimpleDateFormat dformat = new SimpleDateFormat("yyyy-MM-dd");
 //            r.getMemorandumState().setExpire(dformat.parse(message.getExpire()));
-            log.info(message.getExpire());
+            r.getMemorandumState().setExpire(message.getExpire());
             message.setMessage("ok");
             message.setMemorandumState(r.getMemorandumState());
             template.convertAndSend("/sub/memorandum/expire/" + message.getRoomCode(), message);
