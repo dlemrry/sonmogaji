@@ -31,6 +31,8 @@ public class ApachePOIServiceImpl implements ApachePOIService{
     public BufferedImage createPreview(TransactionDto transactionDto,String sessionId) throws Exception {
 //        String sample = "src/main/resources/static/memorandom.docx";
 
+        File filee = new File("abcdefg.docx");
+        filee.createNewFile();
         ClassPathResource sample = new ClassPathResource("static/memorandom.docx");
 //        String sample2 = String.valueOf(amazonS3.getUrl("sonmogaji", "memorandom.docx"));
         FileOutputStream fos = null;
